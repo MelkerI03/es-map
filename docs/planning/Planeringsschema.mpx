@@ -1,0 +1,45 @@
+MPX;Microsoft Project for Windows;4.0;ANSI
+10;kr;2;2; ;,
+11;2;0;1;8,00;40,00;10,00 kr/t;15,00 kr/t;1;0
+12;2;1;480;-;:;;;9;9
+20;Standard;0;1;1;1;1;1;0
+25;1
+25;2;08:00;12:00;13:00;17:00
+25;3;08:00;12:00;13:00;17:00
+25;4;08:00;12:00;13:00;17:00
+25;5;08:00;12:00;13:00;17:00
+25;6;08:00;12:00;13:00;17:00
+25;7
+20;Standard 1;0;1;1;1;1;1;0
+25;1
+25;2;08:00;12:00;13:00;17:00
+25;3;08:00;12:00;13:00;17:00
+25;4;08:00;12:00;13:00;17:00
+25;5;08:00;12:00;13:00;17:00
+25;6;08:00;12:00;13:00;17:00
+25;7
+30;Project1;;;Standard;tis 26-02-03;fre 26-05-29;0;ons 26-02-04;;0,00 kr;0,00 kr;0,00 kr;0t;0t;0t;0%;0d;0d;0d;0%;;;;;0d;0d
+40;ID;Eget ID
+41;40;49
+50;1;1
+55;Standard;0;1;1;1;1;1;0
+56;1
+56;2;08:00;12:00;13:00;17:00
+56;3;08:00;12:00;13:00;17:00
+56;4;08:00;12:00;13:00;17:00
+56;5;08:00;12:00;13:00;17:00
+56;6;08:00;12:00;13:00;17:00
+56;7
+57;26-02-23;26-03-07;0
+60;Namn;WBS;Dispositionsnivå;Varaktighet;Actual Duration;Remaining Duration;% färdigt;Start;Slut;Föregående aktiviteter;Fast;ID;Villkorstyp;Prioritet;Eget ID;Outline Number
+61;1;2;3;40;42;43;44;50;51;70;80;90;91;95;98;99
+70;;0;0;116d;;;;tis 26-02-03;fre 26-05-29;;Nej;0;As Soon As Possible;;0;0
+70;Planering;1;1;8d;2,4d;5,6d;30%;tis 26-02-03;tors 26-02-12;;Nej;1;As Soon As Possible;Highest;9;1
+70;Utveckling;2;1;70d;0d;70d;0%;tors 26-02-12;ons 26-05-20;;Nej;2;As Soon As Possible;Medium;3;2
+70;Inlämning informationskompetens;3;1;2d;0d;2d;0%;mån 26-02-16;tis 26-02-17;;Nej;3;As Soon As Possible;Medium;2;3
+70;Preliminär slutrapport;4;1;25d;0d;25d;0%;mån 26-03-30;fre 26-05-01;;Nej;4;As Soon As Possible;Medium;4;4
+70;Presentationsmaterial;5;1;10d;0d;10d;0%;mån 26-05-04;fre 26-05-15;;Nej;5;As Soon As Possible;Medium;5;5
+70;Oppositionsrapport;6;1;3d;0d;3d;0%;mån 26-05-18;ons 26-05-20;;Nej;6;As Soon As Possible;Medium;6;6
+70;Slutrapport;7;1;7d;0d;7d;0%;tors 26-05-21;fre 26-05-29;6;Nej;7;As Soon As Possible;Medium;7;7
+70;Bidragsrapport;8;1;2d;0d;2d;0%;tors 26-05-28;fre 26-05-29;;Nej;8;As Soon As Possible;Medium;8;8
+70;Paus;9;1;10d;0d;10d;0%;mån 26-02-23;fre 26-03-06;;Nej;9;As Soon As Possible;Highest;1;9
