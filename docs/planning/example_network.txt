@@ -1,0 +1,6 @@
+I have a host (192.168.233.1) called Server1. It is a generic server which serves content to the other machines.
+
+4 Clients are hooked up to Server1.
+They have the IP-naming convension of ClientN is on 192.168.233.1N
+
+The server is hooked up to the internet

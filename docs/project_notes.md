@@ -18,3 +18,11 @@ And how do we determine which those are?
 Currently, the interesting fields are those that specify the contents highlighted in green in the paper you got in the drawer.
 
 From there we are using kibanas rest API to fetch and post our dashboard(s) onto the currently running service
+
+# Simulated Environment
+
+* Åtminstone en klient som inte gör någonting
+* Åtminstone en klient som ansluter och kopplar ur under gång.
+* Implementera security onion, så zeek och liknande nätverksloggar kan utvinnas från alla maskiner.
+* Sysmon med swiftonsecurity standard. 
+* Linux system
