@@ -5,7 +5,7 @@ requires-python = ">=3.13"
 dependencies = ["graphviz"]
 
 [project.scripts]
-es-map = "es_map.main:main"
+es-map = "es_map.cli:main"
 
 [build-system]
 requires = ["setuptools"]
