@@ -1,11 +1,11 @@
 [project]
-name = "my-app"
+name = "es-map"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = ["graphviz"]
 
 [project.scripts]
-my-app = "my_app.main:main"
+es-map = "es_map.main:main"
 
 [build-system]
 requires = ["setuptools"]

@@ -48,7 +48,7 @@
         in
         {
           default = python.pkgs.buildPythonApplication {
-            pname = "my-app";
+            pname = "es-map";
             version = "0.1.0";
 
             src = ./.;
