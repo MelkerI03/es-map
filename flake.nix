@@ -55,6 +55,11 @@
 
             pyproject = true;
 
+            nativeBuildInputs = with python.pkgs; [
+              setuptools
+              wheel
+            ];
+
             # Runtime dependencies go here
             propagatedBuildInputs = with python.pkgs; [
               graphviz
@@ -79,6 +84,8 @@
             packages = with pkgs; [
               python
               python.pkgs.pip
+              python.pkgs.graphviz
+
               graphviz
             ];
           };
