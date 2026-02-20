@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from typing import Optional
 
 from es_map.config import ConfigError, ElasticConfig, validate_config
+from es_map.elastic.client import create_client
 
 
 load_dotenv(Path.cwd() / ".env")
@@ -137,6 +138,8 @@ def main(
     except ConfigError as e:
         typer.secho(f"Configuration error: {e}", fg="red")
         raise typer.Exit(code=1)
+
+    create_client(config)
 
 
 if __name__ == "__main__":

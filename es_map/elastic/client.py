@@ -44,4 +44,9 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
 
     client = Elasticsearch(**kwargs)
 
+    # Test connection
+    info = client.info()
+    print(info)
+    print(client.ping())
+
     return client
