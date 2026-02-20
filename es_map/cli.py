@@ -6,7 +6,7 @@ from typing import Optional
 from es_map.config import ConfigError, ElasticConfig, validate_config
 
 
-load_dotenv()
+load_dotenv(Path.cwd() / ".env")
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
@@ -62,7 +62,7 @@ def main(
         "--index",
         "-i",
         help="Specific index to analyze",
-        envvar="ES_CA_CERT",
+        envvar="ES_INDEX",
     ),
     use_ssl: bool = typer.Option(
         False,
@@ -103,8 +103,6 @@ def main(
 ):
     """
     Elasticsearch Network Mapper CLI
-
-    Valid credentials for authorized account is required
     """
     typer.echo("Generating Elasticsearch network map...")
     typer.echo(f"Host: {host}")
@@ -139,7 +137,6 @@ def main(
     except ConfigError as e:
         typer.secho(f"Configuration error: {e}", fg="red")
         raise typer.Exit(code=1)
-    # generate_map(host, port, username, password, output, index)
 
 
 if __name__ == "__main__":
