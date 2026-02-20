@@ -2,10 +2,14 @@
 name = "es-map"
 version = "0.1.0"
 requires-python = ">=3.13"
-dependencies = ["graphviz"]
+dependencies = [
+  "elasticsearch>=8.0.0",
+  "graphviz>=0.20.0",
+  "python-dotenv>=1.0.0"
+]
 
 [project.scripts]
-es-map = "es_map.cli:main"
+es-map = "es_map.cli:app"
 
 [build-system]
 requires = ["setuptools"]

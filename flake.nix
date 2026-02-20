@@ -63,6 +63,9 @@
             # Runtime dependencies go here
             propagatedBuildInputs = with python.pkgs; [
               graphviz
+              elasticsearch
+              python-dotenv
+              typer
             ];
 
             doCheck = false; # As long as there arent any.
@@ -85,8 +88,12 @@
               python
               python.pkgs.pip
               python.pkgs.graphviz
+              python.pkgs.python-dotenv
+              python.pkgs.typer
+              python.pkgs.elasticsearch
 
               graphviz
+              # elasticsearch
             ];
           };
         }
