@@ -51,11 +51,11 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
 
     client = Elasticsearch(**kwargs)
 
-    try:
-        client.info()
-    except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+    # try:
+    #     client.info()
+    # except Exception as e:
+    #     print(f"Error: {e}")
+    #     sys.exit(1)
 
     # TODO: remove debugging function
     print(get_hosts(client, "*"))

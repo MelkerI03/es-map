@@ -5,12 +5,14 @@ from typing import Optional
 
 from es_map.config import ConfigError, ElasticConfig, validate_config
 from es_map.elastic.client import create_client
+from es_map.utils.logging import get_logger, setup_logging
 
 
 if not load_dotenv(Path.cwd() / ".env"):
     load_dotenv()
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
+logger = get_logger(__name__)
 
 
 @app.command()
@@ -102,23 +104,26 @@ def main(
         help="Verify server certificate",
         envvar="ES_VERIFY",
     ),
+    log_level: str = typer.Option(
+        "INFO",
+        "--log-level",
+        "-l",
+        help="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+    ),
+    log_file: Optional[Path] = typer.Option(
+        None,
+        "--log-file",
+        help="Optional log file path",
+    ),
 ):
     """
     Elasticsearch Network Mapper CLI
     """
-    typer.echo("Generating Elasticsearch network map...")
-    typer.echo(f"Host: {host}")
-    typer.echo(f"Port: {port}")
-    typer.echo(f"Index: {index}")
-    typer.echo(f"Output file: {output}")
-    typer.echo(f"Username: {username}")
-    typer.echo(f"Password: {password}")
-    typer.echo(f"Api_key: {api_key}")
-    typer.echo(f"Use_SSL: {use_ssl}")
-    typer.echo(f"CA cert: {ca_cert}")
-    typer.echo(f"client cert: {client_cert}")
-    typer.echo(f"Client key: {client_key}")
-    typer.echo(f"Verification: {verify}")
+
+    setup_logging(level=log_level, log_file=log_file)
+
+    logger.info("Starting Elasticsearch Network Mapper")
+    logger.debug("CLI arguments: %s", locals())
 
     config = ElasticConfig(
         host=host,
@@ -134,13 +139,25 @@ def main(
         client_key=client_key,
         verify=verify,
     )
+
     try:
         validate_config(config)
     except ConfigError as e:
-        typer.secho(f"Configuration error: {e}", fg="red")
+        logger.warning("Configuration validation failed: %s", e)
+        typer.secho(f"Configuration error: {e}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
 
-    create_client(config)
+    try:
+        create_client(config)
+    except Exception as e:
+        logger.critical(f"Fatal error while creating client: {e}", exc_info=False)
+        typer.secho(
+            f"Fatal error: {e}. Run with --log-level DEBUG for details.",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(code=1)
+
+    logger.info("Finished successfully")
 
 
 if __name__ == "__main__":
