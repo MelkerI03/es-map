@@ -1,4 +1,5 @@
-from typing import Any
+import sys
+from typing import Any, List
 from elasticsearch import Elasticsearch
 from es_map.config import ElasticConfig
 
@@ -15,6 +16,7 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
     Returns:
         Elasticsearch: Configured client instance.
     """
+    timeout = 3  # Seconds
     scheme = "https" if config.use_ssl else "http"
 
     kwargs: dict[str, Any] = {
@@ -27,6 +29,9 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
         ],
         "verify_certs": config.verify,
     }
+
+    if config.index:
+        kwargs["index"] = config.index
 
     if config.ca_cert:
         kwargs["ca_certs"] = str(config.ca_cert)
@@ -42,11 +47,29 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
     elif config.username and config.password:
         kwargs["basic_auth"] = (config.username, config.password)
 
+    kwargs["timeout"] = timeout
+
     client = Elasticsearch(**kwargs)
 
-    # Test connection
-    info = client.info()
-    print(info)
-    print(client.ping())
+    try:
+        client.info()
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+    # TODO: remove debugging function
+    print(get_hosts(client, "*"))
 
     return client
+
+
+# TODO: Dev function, not a function to be used under production. Should be removed
+def get_hosts(client: Elasticsearch, index: str) -> List[str]:
+    response = client.search(
+        index=index,
+        size=0,
+        aggs={"hosts": {"terms": {"field": "host.name", "size": 1000}}},
+    )
+
+    buckets = response.body["aggregations"]["hosts"]["buckets"]
+    return [bucket["key"] for bucket in buckets]
