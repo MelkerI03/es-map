@@ -1,1 +1,7 @@
 https://semver.org/
+
+# Subnet inference
+https://dl.acm.org/doi/epdf/10.1145/1298306.1298334
+
+# Ip alias resolution
+http://ccr.sigcomm.org/online/files/p50-v40n1j-keysA.pdf
