@@ -7,7 +7,10 @@ from es_map.config import ConfigError, ElasticConfig, validate_config
 from es_map.elastic.client import create_client
 
 
-load_dotenv(Path.cwd() / ".env")
+if load_dotenv(Path.cwd() / ".env"):
+    pass
+else:
+    load_dotenv()
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
