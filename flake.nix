@@ -85,16 +85,17 @@
         in
         {
           default = pkgs.mkShell {
-            packages = with pkgs; [
+            packages = with python.pkgs; [
               python
-              python.pkgs.pip
-              python.pkgs.graphviz
-              python.pkgs.python-dotenv
-              python.pkgs.typer
-              python.pkgs.elasticsearch
-
+              pip
               graphviz
-              # elasticsearch
+              python-dotenv
+              typer
+              elasticsearch
+              # networkx
+
+              pkgs.graphviz
+              # pkgs.elasticsearch
             ];
           };
         }
