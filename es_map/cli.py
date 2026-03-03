@@ -183,6 +183,7 @@ def main(
     for host in hosts:
         registry.attach_host(host)
 
+    logger.debug(f"registry subnets: {registry._subnets}")
     logger.info("Finished successfully")
 
 
