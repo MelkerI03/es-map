@@ -45,6 +45,7 @@
         { pkgs }:
         let
           python = pkgs."python${concatMajorMinor pkgs version}";
+
         in
         {
           default = python.pkgs.buildPythonApplication {
