@@ -1,9 +1,14 @@
 from pathlib import Path
 import typer
 from dotenv import load_dotenv
-from typing import Optional
+from typing import List, Optional
 
-from es_map.config import ConfigError, ElasticConfig, validate_config
+from es_map.config import (
+    ConfigError,
+    ElasticConfig,
+    parse_and_validate_subnets,
+    validate_config,
+)
 from es_map.elastic.client import create_client
 from es_map.utils.logging import get_logger, setup_logging
 
