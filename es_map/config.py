@@ -1,12 +1,14 @@
 from dataclasses import dataclass
+import ipaddress
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
 class ElasticConfig:
     host: str
     port: int
+    subnets: List[ipaddress.IPv4Network]
     index: Optional[str] = None
     output: Path = Path("out/network.gv")
     username: Optional[str] = None
@@ -22,6 +24,7 @@ class ElasticConfig:
 def build_config(
     host: str,
     port: int,
+    subnets: List[ipaddress.IPv4Network],
     index: str,
     output: Path,
     username: Optional[str],
@@ -37,6 +40,7 @@ def build_config(
     return ElasticConfig(
         host=host,
         port=port,
+        subnets=subnets,
         index=index,
         output=output,
         username=username,
@@ -52,6 +56,20 @@ def build_config(
 
 class ConfigError(Exception):
     pass
+
+
+def parse_and_validate_subnets(raw_subnets: List[str]):
+    validated_subnets: list[ipaddress.IPv4Network] = []
+
+    for subnet in raw_subnets:
+        try:
+            network = ipaddress.ip_network(subnet, strict=False)
+            assert type(network) == ipaddress.IPv4Network
+            validated_subnets.append(network)
+        except (ValueError, AssertionError):
+            raise ConfigError(f"Invalid IPv4 CIDR format: {subnet}")
+
+    return validated_subnets
 
 
 def validate_config(config: ElasticConfig) -> None:

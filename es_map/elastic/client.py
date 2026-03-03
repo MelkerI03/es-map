@@ -1,4 +1,3 @@
-import sys
 from typing import Any, List
 from elasticsearch import Elasticsearch
 from es_map.config import ElasticConfig

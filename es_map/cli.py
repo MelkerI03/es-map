@@ -3,6 +3,8 @@ import typer
 from dotenv import load_dotenv
 from typing import List, Optional
 
+from es_map.analysis.ingest import build_hosts_from_es
+from es_map.analysis.models import SubnetRegistry
 from es_map.config import (
     ConfigError,
     ElasticConfig,
@@ -22,7 +24,8 @@ logger = get_logger(__name__)
 
 @app.command()
 def main(
-    host: str = typer.Option(
+    subnets: List[str] = typer.Argument(..., help="List of subnets in CIDR notation"),
+    elastic_host: str = typer.Option(
         "localhost",
         "--host",
         "-H",
@@ -130,9 +133,21 @@ def main(
     logger.info("Starting Elasticsearch Network Mapper")
     logger.debug("CLI arguments: %s", locals())
 
+    try:
+        parsed_subnets = parse_and_validate_subnets(subnets)
+    except (ValueError, AssertionError) as e:
+        print(e)
+        logger.critical("Invalid IPv4 CIDR format: {subnet}")
+        typer.secho(
+            f"Fatal error: {e}. Run with --log-level DEBUG for details.",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(code=1)
+
     config = ElasticConfig(
-        host=host,
+        host=elastic_host,
         port=port,
+        subnets=parsed_subnets,
         index=index,
         output=output,
         username=username,
@@ -150,10 +165,9 @@ def main(
     except ConfigError as e:
         logger.warning("Configuration validation failed: %s", e)
         typer.secho(f"Configuration error: {e}", fg=typer.colors.RED)
-        raise typer.Exit(code=1)
 
     try:
-        create_client(config)
+        client = create_client(config)
     except Exception as e:
         logger.critical(f"Fatal error while creating client: {e}", exc_info=False)
         typer.secho(
@@ -161,6 +175,13 @@ def main(
             fg=typer.colors.RED,
         )
         raise typer.Exit(code=1)
+
+    hosts = build_hosts_from_es(client, config.index)
+
+    registry = SubnetRegistry(parsed_subnets)
+
+    for host in hosts:
+        registry.attach_host(host)
 
     logger.info("Finished successfully")
 
