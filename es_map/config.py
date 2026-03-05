@@ -59,7 +59,7 @@ class ConfigError(Exception):
 
 
 def parse_and_validate_subnets(raw_subnets: List[str]):
-    validated_subnets: list[ipaddress.IPv4Network] = []
+    validated_subnets: List[ipaddress.IPv4Network] = []
 
     for subnet in raw_subnets:
         try:

@@ -1,4 +1,5 @@
 import ipaddress
+from typing import List
 
 from elasticsearch import Elasticsearch
 from es_map.elastic.queries import fetch_hosts
@@ -8,10 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def build_hosts_from_es(client: Elasticsearch, index: str | None) -> list[Host]:
+def build_hosts_from_es(client: Elasticsearch, index: str | None) -> List[Host]:
     raw_hosts = fetch_hosts(client, index)
 
-    hosts: list[Host] = []
+    hosts: List[Host] = []
 
     for entry in raw_hosts:
         host = Host(

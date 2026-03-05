@@ -12,7 +12,9 @@ from es_map.config import (
     validate_config,
 )
 from es_map.elastic.client import create_client
+from es_map.graph.builder import build_graph_from_registry
 from es_map.utils.logging import get_logger, setup_logging
+import networkx as nx
 
 
 if not load_dotenv(Path.cwd() / ".env"):
@@ -183,7 +185,32 @@ def main(
     for host in hosts:
         registry.attach_host(host)
 
-    logger.debug(f"registry subnets: {registry._subnets}")
+    logger.debug(f"registry subnets: {registry}")
+
+    # -------------------------------------------------
+    # TODO: DEBUGGING TOOLS
+
+    def print_graph(graph):
+        print("\n--- GRAPH STRUCTURE ---")
+
+        for node, data in graph.nodes(data=True):
+            if data.get("type") == "router":
+                print(f"\n[{data['label']}]")
+
+                for neighbor in graph.neighbors(node):
+                    ndata = graph.nodes[neighbor]
+
+                    if ndata["type"] == "host":
+                        print(f"  └─ host: {ndata['label']}")
+
+                    elif ndata["type"] == "router":
+                        print(f"  └─ router -> {ndata['label']}")
+
+    graph = build_graph_from_registry(registry)
+    print_graph(graph)
+
+    # -------------------------------------------------
+
     logger.info("Finished successfully")
 
 

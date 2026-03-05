@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address, IPv4Network
-from typing import List, Set, Dict
+from typing import List, Optional, Set, Dict
+import hashlib
 
 
 @dataclass(eq=True)
@@ -10,6 +11,9 @@ class Host:
     host_id: str
     hostname: str | None = None
     ips: Set[IPv4Address] = field(default_factory=set)
+    child_subnets: List["SubnetNode"] = field(
+        default_factory=list
+    )  # For virtual subnets
 
     def __hash__(self) -> int:
         """Compute hash based on host_id."""
@@ -30,6 +34,10 @@ class SubnetNode:
 
     network: IPv4Network
     hosts: Set[Host] = field(default_factory=set)
+    parent: Optional["SubnetNode"] = field(
+        default=None, repr=False, compare=False
+    )  # TODO: add Union[Host, SubnetNode] so that virtual subnets can be owned by a host
+    child_subnets: List["SubnetNode"] = field(default_factory=list, repr=False)
 
     def add_host(self, host: Host) -> None:
         """Add a host to the subnet.
@@ -38,6 +46,14 @@ class SubnetNode:
             host (Host): Host to add.
         """
         self.hosts.add(host)
+
+    # TODO: Discern different NAT'ed subnet ids from eachother. Might be 2 different 10.0.2.0/24 subnets in the same network.
+    @property
+    def network_id(self) -> str:
+        """A stable hashed identifier for this subnet."""
+        raw = str(self.network).encode("utf-8")
+        digest = hashlib.sha256(raw).hexdigest()
+        return f"subnet:{digest[:12]}"
 
 
 class SubnetRegistry:
@@ -52,6 +68,10 @@ class SubnetRegistry:
         self._subnets: Dict[IPv4Network, SubnetNode] = {
             net: SubnetNode(network=net) for net in networks
         }
+        self._build_hierarchy()
+
+    def __repr__(self) -> str:
+        return self._subnets.__repr__()
 
     def find_subnets(self, ip: IPv4Address) -> List[SubnetNode]:
         """Find all subnets containing a given IP address.
@@ -64,12 +84,55 @@ class SubnetRegistry:
         """
         return [subnet for subnet in self._subnets.values() if ip in subnet.network]
 
+    # TODO: Untested method
+    def _find_subnets_recursive(
+        self, ip: IPv4Address, subnet: SubnetNode
+    ) -> List[SubnetNode]:
+        """Recursive helper to check nested subnets."""
+        matches = []
+        if ip in subnet.network:
+            matches.append(subnet)
+        for child in subnet.child_subnets:
+            matches.extend(self._find_subnets_recursive(ip, child))
+        return matches
+
+    def _build_hierarchy(self) -> None:
+        """Assign parent relationships between subnets using CIDR containment."""
+
+        subnets = list(self._subnets.values())
+
+        subnets.sort(key=lambda s: s.network.prefixlen)
+
+        candidates = []
+
+        for subnet in subnets:
+            subnet.parent = None
+
+            for parent in reversed(candidates):
+                if subnet.network.subnet_of(parent.network):
+                    subnet.parent = parent
+                    parent.child_subnets.append(subnet)
+                    break
+
+            candidates.append(subnet)
+
     def attach_host(self, host: Host) -> None:
-        """Attach a host to all subnets that contain its IP addresses.
+        """Attach a host to the most specific subnets that contain its IP addresses.
 
         Args:
             host (Host): Host to attach.
         """
+
         for ip in host.ips:
-            for subnet in self.find_subnets(ip):
-                subnet.add_host(host)
+
+            matching = [
+                subnet for subnet in self._subnets.values() if ip in subnet.network
+            ]
+
+            if not matching:
+                continue
+
+            # choose most specific subnet
+            best = max(matching, key=lambda s: s.network.prefixlen)
+
+            best.add_host(host)
