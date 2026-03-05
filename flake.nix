@@ -63,10 +63,11 @@
 
             # Runtime dependencies go here
             propagatedBuildInputs = with python.pkgs; [
-              graphviz
+              networkx
               elasticsearch
               python-dotenv
               typer
+              matplotlib
             ];
 
             doCheck = false; # As long as there arent any.
@@ -92,7 +93,8 @@
               python-dotenv
               typer
               elasticsearch
-              # networkx
+              networkx
+              matplotlib
 
               pkgs.graphviz
               # pkgs.elasticsearch
