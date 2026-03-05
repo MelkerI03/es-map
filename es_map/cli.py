@@ -13,8 +13,11 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 from es_map.graph.builder import build_graph_from_registry
+from es_map.graph.renderer import render_graph
 from es_map.utils.logging import get_logger, setup_logging
-import networkx as nx
+
+# import networkx as nx
+from networkx.drawing.nx_agraph import to_agraph
 
 
 if not load_dotenv(Path.cwd() / ".env"):
@@ -65,7 +68,7 @@ def main(
         envvar="ES_API_KEY",
     ),
     output: Path = typer.Option(
-        Path("out/network.gv"),
+        Path("out/network.svg"),
         "--output",
         "-o",
         help="Output file name",

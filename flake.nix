@@ -68,6 +68,7 @@
               python-dotenv
               typer
               matplotlib
+              pygraphviz
             ];
 
             doCheck = false; # As long as there arent any.
@@ -95,6 +96,7 @@
               elasticsearch
               networkx
               matplotlib
+              pygraphviz
 
               pkgs.graphviz
               # pkgs.elasticsearch
