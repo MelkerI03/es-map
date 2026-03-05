@@ -16,9 +16,6 @@ from es_map.graph.builder import build_graph_from_registry
 from es_map.graph.renderer import render_graph
 from es_map.utils.logging import get_logger, setup_logging
 
-# import networkx as nx
-from networkx.drawing.nx_agraph import to_agraph
-
 
 if not load_dotenv(Path.cwd() / ".env"):
     load_dotenv()
@@ -190,28 +187,11 @@ def main(
 
     logger.debug(f"registry subnets: {registry}")
 
+    graph = build_graph_from_registry(registry)
+    render_graph(graph, output)
+
     # -------------------------------------------------
     # TODO: DEBUGGING TOOLS
-
-    def print_graph(graph):
-        print("\n--- GRAPH STRUCTURE ---")
-
-        for node, data in graph.nodes(data=True):
-            if data.get("type") == "router":
-                print(f"\n[{data['label']}]")
-
-                for neighbor in graph.neighbors(node):
-                    ndata = graph.nodes[neighbor]
-
-                    if ndata["type"] == "host":
-                        print(f"  └─ host: {ndata['label']}")
-
-                    elif ndata["type"] == "router":
-                        print(f"  └─ router -> {ndata['label']}")
-
-    graph = build_graph_from_registry(registry)
-    print_graph(graph)
-
     # -------------------------------------------------
 
     logger.info("Finished successfully")
