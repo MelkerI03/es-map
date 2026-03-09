@@ -49,7 +49,7 @@ jobs:
               $extraFlags = "--onefile --lto=yes"
           }
 
-          nuitka --show-progress --jobs 4 --assume-yes-for-downloads --standalone --lto=yes --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
+          nuitka --show-progress --assume-yes-for-downloads --standalone --lto=yes --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
       
       - name: Move executable
         shell: pwsh
