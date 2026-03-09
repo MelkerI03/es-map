@@ -1,0 +1,48 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies from pyproject.toml
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+          pip install .
+          pip install nuitka
+
+      - name: Build EXE
+        run: |
+          nuitka \
+            --follow-imports \
+            --show-progress \
+            --output-dir=build \
+            --output-filename=es-map \
+            $([ "${BUILD_TYPE}" == "release" ] && echo "--onefile --lto=yes") \
+            es_map/cli.py
+      
+      - name: Install EXE
+        run: |
+          mkdir -p out/bin
+          cp build/es-map* out/bin/es-map
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-exe
+          path: dist/es-map.exe
