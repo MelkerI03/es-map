@@ -42,7 +42,7 @@ jobs:
           cp build/es-map* out/bin/es-map
 
       - name: Upload EXE artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-exe
           path: dist/es-map.exe
