@@ -19,10 +19,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: 3.12
+          channels: conda-forge
+          activate-environment: build-env
+
       - name: Install dependencies from pyproject.toml
         run: |
           choco install graphviz -y
-          echo "GRAPHVIZ_DIR=C:\Program Files\Graphviz" >> $env:GITHUB_ENV
+          conda install pygraphviz graphviz
           python -m pip install --upgrade pip
           pip install build
           pip install .
