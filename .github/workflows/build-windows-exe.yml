@@ -23,6 +23,7 @@ jobs:
         run: |
           choco install graphviz -y
           python -m pip install --upgrade pip
+          pip install pygraphviz --only-binary=:all:
           pip install build
           pip install .
           pip install nuitka
