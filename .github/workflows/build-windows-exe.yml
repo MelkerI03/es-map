@@ -42,10 +42,10 @@ jobs:
         run: |
           python -c "import pygraphviz; print('pygraphviz OK')"
 
-      - name: Install Dependency Walker
-        shell: pwsh
-        run: |
-          choco install depends -y
+      # - name: Install Dependency Walker
+      #   shell: pwsh
+      #   run: |
+      #     choco install depends -y
 
       - name: Build EXE
         run: |
@@ -54,7 +54,7 @@ jobs:
               $extraFlags = "--onefile --lto=yes"
           }
 
-          nuitka --standalone --lto=yes --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
+          nuitka --assume-yes-for-downloads --standalone --lto=yes --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
       
       - name: Install EXE
         run: |
