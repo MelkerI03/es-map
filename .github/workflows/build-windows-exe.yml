@@ -38,7 +38,8 @@ jobs:
       - name: Install EXE
         run: |
           mkdir -p out/bin
-          cp build/es-map* out/bin/es-map
+          mkdir -p out/bin
+          Copy-Item -Path build/es-map.exe -Destination out/bin/es-map.exe
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
