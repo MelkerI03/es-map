@@ -41,6 +41,11 @@ jobs:
         run: |
           python -c "import pygraphviz; print('pygraphviz OK')"
 
+      - name: Install Dependency Walker
+        shell: pwsh
+        run: |
+          choco install depends -y
+
       - name: Build EXE
         run: |
           $extraFlags = ""
