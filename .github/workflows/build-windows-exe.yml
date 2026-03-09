@@ -42,11 +42,6 @@ jobs:
         run: |
           python -c "import pygraphviz; print('pygraphviz OK')"
 
-      # - name: Install Dependency Walker
-      #   shell: pwsh
-      #   run: |
-      #     choco install depends -y
-
       - name: Build EXE
         run: |
           $extraFlags = ""
@@ -59,7 +54,7 @@ jobs:
       - name: Install EXE
         run: |
           mkdir -p out/bin
-          Copy-Item -Path build/es-map.exe -Destination out/bin/es-map.exe
+          Copy-Item -Path build/*.build/es-map.exe -Destination out/bin/es-map.exe
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
