@@ -28,6 +28,7 @@ jobs:
           activate-environment: build-env
 
       - name: Install dependencies from pyproject.toml
+        shell: bash -l {0}
         run: |
           choco install graphviz -y
           conda install pygraphviz graphviz
