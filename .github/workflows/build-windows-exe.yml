@@ -28,13 +28,12 @@ jobs:
 
       - name: Build EXE
         run: |
-          nuitka \
-            --follow-imports \
-            --show-progress \
-            --output-dir=build \
-            --output-filename=es-map \
-            $([ "${BUILD_TYPE}" == "release" ] && echo "--onefile --lto=yes") \
-            es_map/cli.py
+          $extraFlags = ""
+          if ($env:BUILD_TYPE -eq "release") {
+              $extraFlags = "--onefile --lto=yes"
+          }
+
+          nuitka --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
       
       - name: Install EXE
         run: |
