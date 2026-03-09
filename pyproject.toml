@@ -7,13 +7,14 @@ dependencies = [
   "networkx>=3.6.1",
   "pygraphviz>=1.14.0",
   "python-dotenv>=1.0.0",
+  "typer>=0.10.0"
 ]
 
 [project.scripts]
 es-map = "es_map.cli:app"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["nuitka", "setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
