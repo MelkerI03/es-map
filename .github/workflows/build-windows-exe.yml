@@ -60,3 +60,8 @@ jobs:
         with:
           name: windows-exe
           path: out/bin/es-map.exe
+
+      - name: Test executable
+        shell: pwsh
+        run: |
+          out/bin/es-map.exe
