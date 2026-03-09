@@ -48,7 +48,7 @@ jobs:
               $extraFlags = "--onefile --lto=yes"
           }
 
-          nuitka --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
+          nuitka --standalone --lto=yes --follow-imports --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
       
       - name: Install EXE
         run: |
