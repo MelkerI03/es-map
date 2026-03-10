@@ -55,7 +55,8 @@ jobs:
         shell: pwsh
         run: |
           mkdir -p out/bin
-          $exe = Get-ChildItem -Path . -Recurse -Filter es-map.exe | Select-Object -First 1
+          $exe = build/es-map.dist/es-map.exe
+          # $exe = Get-ChildItem -Path . -Recurse -Filter es-map.exe | Select-Object -First 1
           Copy-Item -Path $exe.FullName -Destination out/bin/es-map.exe
 
       - name: Upload artifact
