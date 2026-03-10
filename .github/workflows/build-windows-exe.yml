@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -56,7 +56,6 @@ jobs:
         run: |
           mkdir -p out/bin
           $exe = "build/cli.dist/es-map.exe"
-          # $exe = Get-ChildItem -Path . -Recurse -Filter es-map.exe | Select-Object -First 1
           Copy-Item -Path $exe -Destination out/bin/es-map.exe
 
       - name: Upload artifact
@@ -68,4 +67,4 @@ jobs:
       - name: Func test exe
         shell: pwsh
         run: |
-          & ".\out\bin\es-map.exe --help"
+          & ".\out\bin\es-map.exe" --help
