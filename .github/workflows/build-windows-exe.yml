@@ -68,4 +68,4 @@ jobs:
       - name: Func test exe
         shell: pwsh
         run: |
-          & ".\out\bin\es-map.exe"
+          & ".\out\bin\es-map.exe --help"

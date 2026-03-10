@@ -107,6 +107,7 @@
             nativeBuildInputs = with python.pkgs; [
               setuptools
               wheel
+              nuitka
             ];
 
             propagatedBuildInputs = with python.pkgs; [
