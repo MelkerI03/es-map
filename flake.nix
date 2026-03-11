@@ -57,44 +57,40 @@
             python.pkgs.nuitka
             pkgs.graphviz
           ];
-
-          makeNuitkaDerivation =
-            buildType:
-            pkgs.stdenv.mkDerivation {
-              pname = "es-map-${buildType}";
-              version = "0.1.0";
-              src = ./.;
-
-              nativeBuildInputs = [
-                py
-                pkgs.graphviz
-              ];
-
-              buildInputs = commonInputs;
-
-              buildPhase = ''
-                mkdir -p build
-
-                nuitka \
-                  --follow-imports \
-                  --show-progress \
-                  --output-dir=build \
-                  --output-filename=es-map \
-                  ${pkgs.lib.optionalString (buildType == "release") "--onefile --lto=yes"} \
-                  es_map/cli.py
-              '';
-
-              installPhase = ''
-                mkdir -p $out/bin
-                cp build/es-map* $out/bin/es-map
-              '';
-
-              doCheck = false;
-            };
         in
         {
-          dev = makeNuitkaDerivation "dev";
-          release = makeNuitkaDerivation "release";
+          compile = pkgs.stdenv.mkDerivation {
+            pname = "es-map";
+            version = "0.1.0";
+            src = ./.;
+
+            nativeBuildInputs = [
+              py
+              pkgs.graphviz
+            ];
+
+            buildInputs = commonInputs;
+
+            buildPhase = ''
+              mkdir -p build
+
+              nuitka \
+                --follow-imports \
+                --show-progress \
+                --output-dir=build \
+                --output-filename=es-map \
+                --onefile \
+                --lto=yes \
+                es_map/cli.py
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp build/es-map* $out/bin/es-map
+            '';
+
+            doCheck = false;
+          };
 
           default = python.pkgs.buildPythonApplication {
             pname = "es-map";

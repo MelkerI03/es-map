@@ -14,7 +14,7 @@ dependencies = [
 es-map = "es_map.cli:app"
 
 [build-system]
-requires = ["nuitka", "setuptools", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
