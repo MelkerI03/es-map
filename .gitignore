@@ -4,3 +4,6 @@
 .$*
 result
 out/*
+build/*
+dist/*
+es_map.egg*
