@@ -22,9 +22,9 @@ def build_hosts_from_es(client: Elasticsearch, index: str | None) -> List[Host]:
 
         for ip_str in entry["ips"]:
             ip_addr = ipaddress.ip_address(ip_str)
-            if type(ip_addr) == ipaddress.IPv6Address:
+            if isinstance(ip_addr, ipaddress.IPv6Address):
                 continue
-            assert type(ip_addr) == ipaddress.IPv4Address
+            assert isinstance(ip_addr, ipaddress.IPv4Address)
 
             host.add_ip(ip_addr)
 

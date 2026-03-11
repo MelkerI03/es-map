@@ -64,7 +64,7 @@ def parse_and_validate_subnets(raw_subnets: List[str]):
     for subnet in raw_subnets:
         try:
             network = ipaddress.ip_network(subnet, strict=False)
-            assert type(network) == ipaddress.IPv4Network
+            assert isinstance(network, ipaddress.IPv4Network)
             validated_subnets.append(network)
         except (ValueError, AssertionError):
             raise ConfigError(f"Invalid IPv4 CIDR format: {subnet}")
