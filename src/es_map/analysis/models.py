@@ -55,6 +55,10 @@ class SubnetNode:
         digest = hashlib.sha256(raw).hexdigest()
         return f"subnet:{digest[:12]}"
 
+    @property
+    def router_id(self) -> str:
+        return f"router:{self.network_id}"
+
 
 class SubnetRegistry:
     """Registry that maps subnets to their respective hosts."""
@@ -73,7 +77,7 @@ class SubnetRegistry:
     def __repr__(self) -> str:
         return self._subnets.__repr__()
 
-    def find_subnets(self, ip: IPv4Address) -> List[SubnetNode]:
+    def find_subnets_from_ip(self, ip: IPv4Address) -> List[SubnetNode]:
         """Find all subnets containing a given IP address.
 
         Args:
@@ -83,18 +87,6 @@ class SubnetRegistry:
             List[SubnetNode]: List of subnet nodes containing the IP.
         """
         return [subnet for subnet in self._subnets.values() if ip in subnet.network]
-
-    # TODO: Untested method
-    def _find_subnets_recursive(
-        self, ip: IPv4Address, subnet: SubnetNode
-    ) -> List[SubnetNode]:
-        """Recursive helper to check nested subnets."""
-        matches = []
-        if ip in subnet.network:
-            matches.append(subnet)
-        for child in subnet.child_subnets:
-            matches.extend(self._find_subnets_recursive(ip, child))
-        return matches
 
     def _build_hierarchy(self) -> None:
         """Assign parent relationships between subnets using CIDR containment."""
@@ -125,9 +117,7 @@ class SubnetRegistry:
 
         for ip in host.ips:
 
-            matching = [
-                subnet for subnet in self._subnets.values() if ip in subnet.network
-            ]
+            matching = self.find_subnets_from_ip(ip)
 
             if not matching:
                 continue

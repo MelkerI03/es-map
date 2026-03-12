@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 import networkx as nx
 from networkx.drawing.nx_agraph import to_agraph

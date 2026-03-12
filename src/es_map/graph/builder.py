@@ -1,98 +1,96 @@
+from typing import List
+from es_map.analysis.models import SubnetNode
 import networkx as nx
+import hypernetx as hnx
 
-from es_map.analysis.models import SubnetNode, Host, SubnetRegistry
 
+def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
+    """Build a hypergraph representing subnet membership.
 
-def build_graph_from_registry(registry: SubnetRegistry) -> nx.Graph:
-    """
-    Build a NetworkX graph representing the network topology.
+    Each subnet is represented as a hyperedge containing all hosts that
+    belong to the subnet as well as the router representing that subnet.
 
-    Routers represent subnets. Hosts connect to the router of the
-    smallest subnet they belong to. Routers connect to their parent
-    subnet router.
+    The resulting hypergraph allows queries such as:
+        - Which nodes belong to a subnet
+        - Which subnets a node belongs to
 
     Args:
-        registry (SubnetRegistry): Registry containing subnet hierarchy.
+        subnets: List of SubnetNode objects representing the network.
 
     Returns:
-        nx.Graph: Network topology graph.
+        hnx.Hypergraph: Hypergraph where:
+            - nodes represent hosts or subnet routers
+            - hyperedges represent subnets
     """
+
+    edges: dict[str, set[str]] = {}
+
+    for subnet in subnets:
+        members: set[str] = set()
+
+        members.add(subnet.router_id)
+
+        for host in subnet.hosts:
+            members.add(host.host_id)
+
+        edges[subnet.network_id] = members
+
+    return hnx.Hypergraph(edges)
+
+
+def build_topology_graph(subnets: List[SubnetNode]) -> nx.Graph:
+    """Build a topology graph describing network routing structure.
+
+    The topology graph models how hosts connect to subnet routers and how
+    subnet routers connect to parent subnet routers. The resulting graph
+    represents the routing hierarchy of the network.
+
+    Edge rules:
+        - Each host connects to the router of the subnet it belongs to.
+        - Each subnet router connects to the router of its parent subnet.
+
+    Args:
+        subnets: List of SubnetNode objects describing the subnet hierarchy.
+
+    Returns:
+        nx.Graph: Undirected graph containing host and router nodes with edges
+        representing routing relationships.
+    """
+
     graph = nx.Graph()
 
-    # Start traversal from root subnets
-    roots = [s for s in registry._subnets.values() if s.parent is None]
+    for subnet in subnets:
+        router_id = subnet.router_id
 
-    for root in roots:
-        _add_subnet_recursive(graph, root)
-
-    return graph
-
-
-def _add_subnet_recursive(graph: nx.Graph, subnet: SubnetNode) -> None:
-    """
-    Recursively add subnet routers and hosts to the graph.
-
-    Args:
-        graph (nx.Graph): Graph being constructed.
-        subnet (SubnetNode): Current subnet.
-    """
-
-    router_id = _router_id(subnet)
-
-    if router_id not in graph:
+        # Ensure router node exists
         graph.add_node(
             router_id,
-            label=str(subnet.network),
             type="router",
             subnet=str(subnet.network),
+            subnet_id=subnet.network_id,
         )
 
-    # Connect router to parent router
-    if subnet.parent:
-        parent_router = _router_id(subnet.parent)
-        graph.add_edge(parent_router, router_id)
+        # Connect hosts to router
+        for host in subnet.hosts:
+            graph.add_node(
+                host.host_id,
+                type="host",
+                hostname=host.hostname,
+            )
 
-    for host in subnet.hosts:
-        host_id = _add_host(graph, host)
-        graph.add_edge(router_id, host_id)
+            graph.add_edge(host.host_id, router_id)
 
-    for child in subnet.child_subnets:
-        _add_subnet_recursive(graph, child)
+        # Connect router to parent router
+        if subnet.parent is not None:
+            parent_router = subnet.parent.router_id
 
+            graph.add_node(
+                parent_router,
+                type="router",
+                subnet=str(subnet.parent.network),
+                subnet_id=subnet.parent.network_id,
+            )
 
-def _add_host(graph: nx.Graph, host: Host) -> str:
-    """
-    Add a host node to the graph.
+            graph.add_edge(router_id, parent_router)
 
-    Args:
-        graph (nx.Graph): Graph being constructed.
-        host (Host): Host object.
-
-    Returns:
-        str: Host node ID.
-    """
-
-    host_id = f"host:{host.host_id}"
-
-    if host_id not in graph:
-        graph.add_node(
-            host_id,
-            label=host.hostname or host.host_id,
-            type="host",
-        )
-
-    return host_id
-
-
-def _router_id(subnet: SubnetNode) -> str:
-    """
-    Generate a router node ID for a subnet.
-
-    Args:
-        subnet (SubnetNode): Subnet node.
-
-    Returns:
-        str: Router node ID.
-    """
-
-    return f"router:{subnet.network_id}"
+    return graph

@@ -15,7 +15,6 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
     Returns:
         Elasticsearch: Configured client instance.
     """
-    timeout = 3  # Seconds
     scheme = "https" if config.use_ssl else "http"
 
     kwargs: dict[str, Any] = {
@@ -46,18 +45,7 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
     elif config.username and config.password:
         kwargs["basic_auth"] = (config.username, config.password)
 
-    kwargs["timeout"] = timeout
-
     client = Elasticsearch(**kwargs)
-
-    # try:
-    #     client.info()
-    # except Exception as e:
-    #     print(f"Error: {e}")
-    #     sys.exit(1)
-
-    # TODO: remove debugging function
-    print(get_hosts(client, "*"))
 
     return client
 

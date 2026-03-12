@@ -12,8 +12,8 @@ from es_map.config import (
     validate_config,
 )
 from es_map.elastic.client import create_client
-from es_map.graph.builder import build_graph_from_registry
-from es_map.graph.renderer import render_graph
+
+from es_map.graph.builder import build_subnet_graph, build_topology_graph
 from es_map.utils.logging import get_logger, setup_logging
 
 
@@ -186,16 +186,33 @@ def main(
     for host in hosts:
         registry.attach_host(host)
 
-    logger.debug(f"registry subnets: {registry}")
+    registry_subnets = list(registry._subnets.values())
+    logger.debug(f"registry subnets: {registry_subnets}")
 
-    # graph = build_graph_from_registry(registry)
+    subnet_graph = build_subnet_graph(registry_subnets)
+    topo_graph = build_topology_graph(registry_subnets)
+
     # render_graph(graph, output)
+
+    logger.info("Finished successfully")
 
     # -------------------------------------------------
     # TODO: DEBUGGING TOOLS
     # -------------------------------------------------
 
-    logger.info("Finished successfully")
+    print("\n------------topo nodes------------\n")
+    for node, attrs in topo_graph.nodes(data=True):
+        print(node, attrs)
+
+    print("\n------------topo edges------------\n")
+    for edge in topo_graph.edges():
+        print(edge)
+
+    print("\n------------subnet edges---------------\n")
+
+    for edge in subnet_graph.edges:
+        members = subnet_graph.edges[edge]
+        print(f"{edge}: {members}")
 
 
 if __name__ == "__main__":
