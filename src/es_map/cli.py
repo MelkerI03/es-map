@@ -14,6 +14,7 @@ from es_map.config import (
 from es_map.elastic.client import create_client
 
 from es_map.graph.builder import build_subnet_graph, build_topology_graph
+from es_map.graph.renderer import render_overlay
 from es_map.utils.logging import get_logger, setup_logging
 
 
@@ -192,7 +193,7 @@ def main(
     subnet_graph = build_subnet_graph(registry_subnets)
     topo_graph = build_topology_graph(registry_subnets)
 
-    # render_graph(graph, output)
+    render_overlay(topo_graph, subnet_graph, output)
 
     logger.info("Finished successfully")
 
