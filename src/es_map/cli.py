@@ -13,9 +13,7 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 
-# from es_map.graph.builder import build_graph_from_registry
 from es_map.graph.builder import build_subnet_graph, build_topology_graph
-from es_map.graph.renderer import render_graph
 from es_map.utils.logging import get_logger, setup_logging
 
 
