@@ -1,182 +1,97 @@
 {
-  description = "A Nix-flake-based Python project";
+  description = "es-map n shi";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    pyproject-nix = {
+      url = "github:pyproject-nix/pyproject.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    uv2nix = {
+      url = "github:pyproject-nix/uv2nix";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.uv2nix.follows = "uv2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
   outputs =
-    { nixpkgs, ... }:
-    let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-
-      forEachSupportedSystem =
-        f:
-        nixpkgs.lib.genAttrs supportedSystems (
-          system:
-          f {
-            pkgs = import nixpkgs {
-              inherit system;
-              config.allowUnfree = true;
-            };
-          }
-        );
-
-      version = "3.13";
-
-      concatMajorMinor =
-        pkgs: v:
-        pkgs.lib.pipe v [
-          pkgs.lib.versions.splitVersion
-          (pkgs.lib.sublist 0 2)
-          pkgs.lib.concatStrings
-        ];
-    in
     {
-      ###########
-      # Package #
-      ###########
+      nixpkgs,
+      pyproject-nix,
+      uv2nix,
+      pyproject-build-systems,
+      ...
+    }:
+    let
+      inherit (nixpkgs) lib;
+      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
-      packages = forEachSupportedSystem (
-        { pkgs }:
+      workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
+
+      overlay = workspace.mkPyprojectOverlay {
+        sourcePreference = "wheel";
+      };
+
+      editableOverlay = workspace.mkEditablePyprojectOverlay {
+        root = "$REPO_ROOT";
+      };
+
+      pythonSets = forAllSystems (
+        system:
         let
-          python = pkgs."python${concatMajorMinor pkgs version}";
-          py = python.withPackages (p: [
-            p.networkx
-            p.elasticsearch
-            p.python-dotenv
-            p.typer
-            p.pygraphviz
-          ]);
-
-          commonInputs = [
-            py
-            python.pkgs.nuitka
-            pkgs.graphviz
-          ];
+          pkgs = nixpkgs.legacyPackages.${system};
+          python = pkgs.python3;
         in
-        {
-          compile = pkgs.stdenv.mkDerivation {
-            pname = "es-map";
-            version = "0.1.0";
-            src = ./.;
-
-            nativeBuildInputs = [
-              py
-              pkgs.graphviz
-            ];
-
-            buildInputs = commonInputs;
-
-            buildPhase = ''
-              mkdir -p build
-
-              nuitka \
-                --follow-imports \
-                --show-progress \
-                --output-dir=build \
-                --output-filename=es-map \
-                --onefile \
-                --lto=yes \
-                es_map/cli.py
-            '';
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp build/es-map* $out/bin/es-map
-            '';
-
-            doCheck = false;
-          };
-
-          default = python.pkgs.buildPythonApplication {
-            pname = "es-map";
-            version = "0.1.0";
-
-            src = ./.;
-
-            pyproject = true;
-
-            nativeBuildInputs = with python.pkgs; [
-              setuptools
-              wheel
-            ];
-
-            propagatedBuildInputs = with python.pkgs; [
-              networkx
-              elasticsearch
-              python-dotenv
-              typer
-              pygraphviz
-            ];
-
-            doCheck = false;
-          };
-
-          windows = pkgs.stdenv.mkDerivation {
-            pname = "es-map-win";
-            version = "0.1.0";
-            src = ./.;
-
-            nativeBuildInputs = [
-              py
-              pkgs.graphviz
-            ];
-
-            buildInputs = commonInputs;
-
-            buildPhase = ''
-              mkdir -p build
-
-              nuitka \
-                --follow-imports \
-                --show-progress \
-                --output-dir=build \
-                --output-filename=es-map.exe \
-                --onefile \
-                --lto=yes \
-                es_map/cli.py
-            '';
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp build/es-map.exe $out/bin/es-map.exe
-            '';
-
-            doCheck = false;
-          };
-        }
+        (pkgs.callPackage pyproject-nix.build.packages {
+          inherit python;
+        }).overrideScope
+          (
+            lib.composeManyExtensions [
+              pyproject-build-systems.overlays.wheel
+              overlay
+            ]
+          )
       );
 
-      ############
-      # DevShell #
-      ############
-
-      devShells = forEachSupportedSystem (
-        { pkgs }:
+    in
+    {
+      devShells = forAllSystems (
+        system:
         let
-          python = pkgs."python${concatMajorMinor pkgs version}";
+          pkgs = nixpkgs.legacyPackages.${system};
+          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          virtualenv = pythonSet.mkVirtualEnv "es-map-dev-env" workspace.deps.all;
         in
         {
           default = pkgs.mkShell {
-            packages = with python.pkgs; [
-              python
-              pip
-              graphviz
-              python-dotenv
-              typer
-              elasticsearch
-              networkx
-              pygraphviz
-
-              pkgs.graphviz
-              # pkgs.elasticsearch
+            packages = [
+              virtualenv
+              pkgs.uv
             ];
+            env = {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = pythonSet.python.interpreter;
+              UV_PYTHON_DOWNLOADS = "never";
+            };
+            shellHook = ''
+              unset PYTHONPATH
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+            '';
           };
         }
       );
+
+      packages = forAllSystems (system: {
+        default = pythonSets.${system}.mkVirtualEnv "es-map" workspace.deps.default;
+      });
     };
 }
