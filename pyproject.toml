@@ -1,21 +1,20 @@
 [project]
 name = "es-map"
 version = "0.1.0"
+description = "Static analysis network graphing tool"
 requires-python = ">=3.12"
 dependencies = [
-  "elasticsearch>=8.0.0",
+  "elasticsearch>=9.3.0",
+  "fastjsonschema>=2.21.2",
+  "hypernetx>=2.4.0",
   "networkx>=3.6.1",
-  "pygraphviz>=1.14.0",
-  "python-dotenv>=1.0.0",
-  "typer>=0.10.0"
+  "python-dotenv>=1.2.2",
+  "typer>=0.24.1",
 ]
 
 [project.scripts]
 es-map = "es_map.cli:app"
 
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["."]
+requires = ["uv_build>=0.10.0,<0.11.0"]
+build-backend = "uv_build"

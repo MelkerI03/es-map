@@ -16,7 +16,6 @@ def setup_logging(
 
     Must be called once from the CLI entrypoint.
     """
-
     numeric_level = getattr(logging, level.upper(), None)
     if not isinstance(numeric_level, int):
         raise ValueError(f"Invalid log level: {level}")

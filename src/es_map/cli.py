@@ -188,8 +188,8 @@ def main(
 
     logger.debug(f"registry subnets: {registry}")
 
-    graph = build_graph_from_registry(registry)
-    render_graph(graph, output)
+    # graph = build_graph_from_registry(registry)
+    # render_graph(graph, output)
 
     # -------------------------------------------------
     # TODO: DEBUGGING TOOLS
