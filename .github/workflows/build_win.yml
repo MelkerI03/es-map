@@ -1,0 +1,50 @@
+name: Build and Package es-map
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Enter flake dev environment
+        uses: nicknovitski/nix-develop@v1
+        with:
+          shell: bash
+
+      - name: Install pip for wheel downloads
+        run: |
+          python -m ensurepip
+          python -m pip install --upgrade pip
+
+      - name: Export requirements.txt
+        run: uv export --format=requirements.txt -o requirements.txt
+
+      - name: Create wheels directory
+        run: mkdir -p wheels
+
+      - name: Download wheels
+        run: |
+          pip download -r requirements.txt -d wheels --platform windows
+
+      - name: Zip wheels directory
+        run: zip -r wheels.zip wheels
+
+      - name: Upload wheels.zip artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: wheels
+          path: wheels.zip
+
+      - name: Build es-map wheel
+        run: uv build
+
+      - name: Upload es-map wheel
+        uses: actions/upload-artifact@v6
+        with:
+          name: es-map-wheel
+          path: dist/*.whl
