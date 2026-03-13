@@ -1,16 +1,27 @@
+<<<<<<< Updated upstream
 name: Build and Package es-map
+=======
+name: Build Windows wheel bundle
+>>>>>>> Stashed changes
 
 on:
   workflow_dispatch:
 
 jobs:
+<<<<<<< Updated upstream
   build-and-package:
     runs-on: ubuntu-latest
+=======
+  build:
+    runs-on: windows-latest
+
+>>>>>>> Stashed changes
     steps:
 
       - name: Checkout repository
         uses: actions/checkout@v6
 
+<<<<<<< Updated upstream
       - name: Enter flake dev environment
         uses: nicknovitski/nix-develop@v1
         with:
@@ -35,6 +46,32 @@ jobs:
         run: zip -r wheels.zip wheels
 
       - name: Upload wheels.zip artifact
+=======
+      - name: Install uv
+        run: pip install uv
+
+      - name: Export requirements
+        run: |
+          uv export --format=requirements.txt -o requirements.txt
+
+      - name: Create wheel directory
+        run: mkdir wheels
+
+      - name: Download dependency wheels
+        run: |
+          uv pip download -r requirements.txt -d wheels --only-binary=:all:
+
+      - name: Build project wheel
+        run: uv build
+
+      - name: Copy project wheel into bundle
+        run: copy dist\*.whl wheels\
+
+      - name: Zip wheel bundle
+        run: powershell Compress-Archive wheels wheels.zip
+
+      - name: Upload artifact
+>>>>>>> Stashed changes
         uses: actions/upload-artifact@v6
         with:
           name: wheels
