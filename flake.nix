@@ -93,5 +93,19 @@
       packages = forAllSystems (system: {
         default = pythonSets.${system}.mkVirtualEnv "es-map" workspace.deps.default;
       });
+
+      formatter = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        pkgs.writeShellApplication {
+          name = "black-fmt";
+          runtimeInputs = [ pkgs.black ];
+          text = ''
+            black .
+          '';
+        }
+      );
     };
 }
