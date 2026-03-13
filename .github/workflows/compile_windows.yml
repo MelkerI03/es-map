@@ -1,0 +1,36 @@
+name: Build Windows EXE with PyInstaller
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv and PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv pyinstaller
+
+      - name: Export requirements
+        run: |
+          uv export --format=requirements.txt -o requirements.txt
+          Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt
+
+      - name: Install dependencies
+        run: pip install -r deps.txt
+
+      - name: Build EXE with PyInstaller
+        run: |
+          # Adjust main.py to your entrypoint
+          pyinstaller --onefile --name es-map src/es_map/cli.py
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: es-map
+          path: dist\*.zip
