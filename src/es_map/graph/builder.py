@@ -22,7 +22,6 @@ def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
             - nodes represent hosts or subnet routers
             - hyperedges represent subnets
     """
-
     edges: dict[str, set[str]] = {}
 
     for subnet in subnets:
@@ -33,7 +32,7 @@ def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
         for host in subnet.hosts:
             members.add(host.host_id)
 
-        edges[subnet.network_id] = members
+        edges[str(subnet.network)] = members
 
     return hnx.Hypergraph(edges)
 
