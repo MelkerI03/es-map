@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 from es_map.analysis.models import SubnetNode
 import networkx as nx
 import hypernetx as hnx
@@ -8,11 +8,8 @@ def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
     """Build a hypergraph representing subnet membership.
 
     Each subnet is represented as a hyperedge containing all hosts that
-    belong to the subnet as well as the router representing that subnet.
-
-    The resulting hypergraph allows queries such as:
-        - Which nodes belong to a subnet
-        - Which subnets a node belongs to
+    belong to the subnet, the router representing that subnet as well as
+    all nodes in child subnets.
 
     Args:
         subnets: List of SubnetNode objects representing the network.
@@ -22,15 +19,22 @@ def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
             - nodes represent hosts or subnet routers
             - hyperedges represent subnets
     """
-    edges: dict[str, set[str]] = {}
 
-    for subnet in subnets:
-        members: set[str] = set()
-
+    def get_children(subnet: SubnetNode) -> Set[str]:
+        members: Set[str] = set()
         members.add(subnet.router_id)
-
         for host in subnet.hosts:
             members.add(host.host_id)
+
+        for child in subnet.child_subnets:
+            members.update(get_children(child))
+
+        return members
+
+    edges: dict[str, Set[str]] = {}
+
+    for subnet in subnets:
+        members = get_children(subnet)
 
         edges[str(subnet.network)] = members
 
