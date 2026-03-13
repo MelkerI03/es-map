@@ -17,7 +17,7 @@ jobs:
       - name: Export requirements
         run: |
           uv export --format=requirements.txt -o requirements.txt
-          powershell -Command "Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt"
+          Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt
 
       - name: Create wheel directory
         run: mkdir wheels
