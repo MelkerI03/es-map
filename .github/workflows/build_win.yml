@@ -24,7 +24,7 @@ jobs:
           pip install --upgrade pip
 
       - name: Export requirements.txt
-      - uses: nicknovitski/nix-develop@v1
+        uses: nicknovitski/nix-develop@v1
         run: uv export --format=requirements.txt -o requirements.txt
 
       - name: Create wheels directory
@@ -44,7 +44,7 @@ jobs:
           path: wheels.zip
 
       - name: Build es-map wheel
-      - uses: nicknovitski/nix-develop@v1
+        uses: nicknovitski/nix-develop@v1
         run: uv build
 
       - name: Upload es-map wheel
