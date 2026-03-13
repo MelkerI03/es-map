@@ -28,7 +28,6 @@ jobs:
           pip install --upgrade pip
 
       - name: Export requirements.txt
-      # - uses: nicknovitski/nix-develop@v1
         run: uv export --format=requirements.txt -o requirements.txt
 
       - name: Create wheels directory
@@ -36,7 +35,10 @@ jobs:
 
       - name: Download wheels
         run: |
-          pip download -r requirements.txt -d wheels --platform windows
+          pip download -r requirements.txt -d wheels \
+          --platform windows \
+          --only-binary=:all: \
+          --no-deps
 
       - name: Zip wheels directory
         run: zip -r wheels.zip wheels
