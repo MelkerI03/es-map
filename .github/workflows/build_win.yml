@@ -11,10 +11,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
       - name: Enter flake dev environment
-        uses: nicknovitski/nix-develop@v1
-        with:
-          shell: bash
+        run: nix develop .#default
 
       - name: Install pip for wheel downloads
         run: |
