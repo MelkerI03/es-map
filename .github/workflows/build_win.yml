@@ -23,7 +23,7 @@ jobs:
 
       - name: Download dependency wheels
         run: |
-          uv pip download -r requirements.txt -d wheels --only-binary=:all:
+          pip download -r requirements.txt -d wheels --only-binary=:all:
 
       - name: Build project wheel
         run: uv build
