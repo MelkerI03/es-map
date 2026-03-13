@@ -1,60 +1,106 @@
-name: Build and Package es-map
+# name: Build and Package es-map
+#
+# on:
+#   workflow_dispatch:
+#
+# jobs:
+#   build-and-package:
+#     runs-on: ubuntu-latest
+#     steps:
+#
+#       - name: Checkout repository
+#         uses: actions/checkout@v6
+#
+#       - name: Install Nix
+#         uses: cachix/install-nix-action@v31
+#
+#       - name: Enter DevShell
+#         uses: nicknovitski/nix-develop@v1
+#
+#       #
+#       # - name: Enter flake dev environment
+#       #   run: nix develop .#default
+#
+#       - name: Install pip for wheel downloads
+#         run: |
+#           python3 -m venv .venv
+#           source .venv/bin/activate
+#           pip install --upgrade pip
+#
+#       - name: Export requirements.txt
+#         run: |
+#           uv export --format=requirements.txt -o requirements.txt
+#           grep -v "^-e " requirements.txt > tmp_requirements.txt
+#
+#       - name: Create wheels directory
+#         run: mkdir -p wheels
+#
+#       - name: Download wheels
+#         run: |
+#           pip download -r tmp_requirements.txt -d wheels \
+#           --platform windows \
+#           --no-deps
+#
+#       - name: Zip wheels directory
+#         run: zip -r wheels.zip wheels
+#
+#       - name: Upload wheels.zip artifact
+#         uses: actions/upload-artifact@v6
+#         with:
+#           name: wheels
+#           path: wheels.zip
+#
+#       - name: Build es-map wheel
+#         run: uv build
+#
+#       - name: Upload es-map wheel
+#         uses: actions/upload-artifact@v6
+#         with:
+#           name: es-map-wheel
+#           path: dist/*.whl
+
+
+name: Build Windows wheels and dependencies
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-and-package:
-    runs-on: ubuntu-latest
-    steps:
+  build-windows:
+    runs-on: windows-latest
 
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Enter DevShell
-        uses: nicknovitski/nix-develop@v1
-
-      #
-      # - name: Enter flake dev environment
-      #   run: nix develop .#default
-
-      - name: Install pip for wheel downloads
+      - name: Install Python + tools
         run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
+          pip install uv cibuildwheel
 
-      - name: Export requirements.txt
+      - name: Build wheels
+        run: cibuildwheel --output-dir dist
+        env:
+          CIBW_PLATFORM: windows
+
+      - name: Export dependencies
         run: |
           uv export --format=requirements.txt -o requirements.txt
-          grep -v "^-e " requirements.txt > tmp_requirements.txt
+          powershell -Command "Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt"
 
-      - name: Create wheels directory
-        run: mkdir -p wheels
-
-      - name: Download wheels
+      - name: Download dependency wheels (Windows)
         run: |
-          pip download -r tmp_requirements.txt -d wheels \
-          --platform windows \
-          --no-deps
+          mkdir wheels
+          pip download -r deps.txt -d wheels --only-binary=:all:
 
-      - name: Zip wheels directory
-        run: zip -r wheels.zip wheels
+      - name: Copy project wheel into bundle
+        run: copy dist\*.whl wheels\
 
-      - name: Upload wheels.zip artifact
+      - name: Zip wheels
+        run: powershell Compress-Archive wheels wheels.zip
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: wheels
+          name: windows-wheel-bundle
           path: wheels.zip
-
-      - name: Build es-map wheel
-        run: uv build
-
-      - name: Upload es-map wheel
-        uses: actions/upload-artifact@v6
-        with:
-          name: es-map-wheel
-          path: dist/*.whl
