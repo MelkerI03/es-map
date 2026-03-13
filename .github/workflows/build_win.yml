@@ -11,8 +11,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # - name: Install Nix
-      #   uses: cachix/install-nix-action@v31
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Enter DevShell
+        uses: nicknovitski/nix-develop@v1
+
       #
       # - name: Enter flake dev environment
       #   run: nix develop .#default
@@ -24,8 +28,8 @@ jobs:
           pip install --upgrade pip
 
       - name: Export requirements.txt
-      - uses: nicknovitski/nix-develop@v1
-      - run: uv export --format=requirements.txt -o requirements.txt
+      # - uses: nicknovitski/nix-develop@v1
+        run: uv export --format=requirements.txt -o requirements.txt
 
       - name: Create wheels directory
         run: mkdir -p wheels
@@ -44,8 +48,7 @@ jobs:
           path: wheels.zip
 
       - name: Build es-map wheel
-      - uses: nicknovitski/nix-develop@v1
-      - run: uv build
+        run: uv build
 
       - name: Upload es-map wheel
         uses: actions/upload-artifact@v6
