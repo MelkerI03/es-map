@@ -32,11 +32,8 @@ jobs:
       - name: Copy project wheel into bundle
         run: copy dist\*.whl wheels\
 
-      - name: Zip wheel bundle
-        run: powershell Compress-Archive wheels wheels.zip
-
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: windows-wheel-bundle
-          path: wheels.zip
+          name: windows-wheels
+          path: wheels
