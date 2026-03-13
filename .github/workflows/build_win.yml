@@ -28,7 +28,9 @@ jobs:
           pip install --upgrade pip
 
       - name: Export requirements.txt
-        run: uv export --format=requirements.txt -o requirements.txt
+        run: |
+          uv export --format=requirements.txt -o requirements.txt
+          grep -v "^-e " requirements.txt > tmp_requirements.txt
 
       - name: Create wheels directory
         run: mkdir -p wheels
