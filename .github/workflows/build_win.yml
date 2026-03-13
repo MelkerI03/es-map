@@ -17,13 +17,14 @@ jobs:
       - name: Export requirements
         run: |
           uv export --format=requirements.txt -o requirements.txt
+          powershell -Command "Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt"
 
       - name: Create wheel directory
         run: mkdir wheels
 
       - name: Download dependency wheels
         run: |
-          pip download -r requirements.txt -d wheels --only-binary=:all:
+          pip download -r deps.txt -d wheels --only-binary=:all:
 
       - name: Build project wheel
         run: uv build
