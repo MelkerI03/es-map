@@ -38,10 +38,15 @@ def render_overlay(
         fill_edge_alpha=-0.8,
     )
 
+    hostnames = {
+        node: (attrs.get("hostname", node) if attrs.get("type") == "host" else "R")
+        for node, attrs in nx_graph.nodes(data=True)
+    }
+
     nx.draw(
         nx_graph,
         pos=node_positions,
-        with_labels=True,
+        labels=hostnames,
         node_color="lightblue",
         edge_color="black",
         node_size=800,
