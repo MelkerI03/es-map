@@ -1,0 +1,44 @@
+name: Build Windows wheels and dependencies
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Python + tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv cibuildwheel
+
+      - name: Build wheels
+        run: cibuildwheel --output-dir dist
+        env:
+          CIBW_PLATFORM: windows
+
+      - name: Export dependencies
+        run: |
+          uv export --format=requirements.txt -o requirements.txt
+          powershell -Command "Get-Content requirements.txt | Where-Object {$_ -notmatch '^-e '} | Set-Content deps.txt"
+
+      - name: Download dependency wheels (Windows)
+        run: |
+          mkdir wheels
+          pip download -r deps.txt -d wheels --only-binary=:all:
+
+      - name: Copy project wheel into bundle
+        run: copy dist\*.whl wheels\
+
+      - name: Zip wheels
+        run: powershell Compress-Archive wheels wheels.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-wheel-bundle
+          path: wheels.zip
