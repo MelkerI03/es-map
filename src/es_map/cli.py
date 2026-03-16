@@ -210,10 +210,15 @@ def main(
         print(edge)
 
     print("\n------------subnet edges---------------\n")
-
     for edge in subnet_graph.edges:
         members = subnet_graph.edges[edge]
         print(f"{edge}: {members}")
+
+    print("\n------------hosts ips---------------\n")
+    for host in hosts:
+        hostname = host.hostname
+        ips = host.ips
+        print(f"{hostname}: {ips}")
 
 
 if __name__ == "__main__":
