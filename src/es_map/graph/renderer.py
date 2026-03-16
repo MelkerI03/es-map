@@ -3,6 +3,12 @@ from typing import Dict, Tuple
 import matplotlib.pyplot as plt
 import networkx as nx
 import hypernetx as hnx
+from hypernetx.drawing.rubber_band import (
+    add_edge_defaults,
+    draw_hyper_edges,
+    get_default_radius,
+    inflate,
+)
 
 
 def render_overlay(
@@ -26,16 +32,32 @@ def render_overlay(
         node: (float(x), float(y)) for node, (x, y) in pos.items()
     }
 
-    _, ax = plt.subplots(figsize=(8, 8))
+    _, ax = plt.subplots()
 
-    hnx.draw(
-        hyper_graph,
+    r0 = get_default_radius(hyper_graph, pos)
+    node_radius = dict(
+        zip(
+            hyper_graph.nodes,
+            [
+                r0 * r
+                for r in inflate(
+                    hyper_graph.nodes, 3
+                )  # pyright: ignore[reportGeneralTypeIssues]
+            ],
+        )
+    )
+
+    dr = 0.2
+    edges_kwargs = add_edge_defaults(hyper_graph, {})
+    draw_hyper_edges(
+        H=hyper_graph,
         pos=node_positions,
-        with_node_labels=False,
-        node_radius=3,
+        node_radius=node_radius,
+        dr=dr,
         ax=ax,
         fill_edges=True,
         fill_edge_alpha=-0.8,
+        **edges_kwargs,
     )
 
     hostnames = {
