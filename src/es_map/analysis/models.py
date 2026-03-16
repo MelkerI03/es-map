@@ -69,6 +69,8 @@ class SubnetRegistry:
         Args:
             networks (List[IPv4Network]): List of IPv4Network objects to register.
         """
+        root_subnet = IPv4Network("0.0.0.0/0")
+        networks.append(root_subnet)
         self._subnets: Dict[IPv4Network, SubnetNode] = {
             net: SubnetNode(network=net) for net in networks
         }

@@ -1,3 +1,4 @@
+import ipaddress
 from typing import List, Set
 from es_map.analysis.models import SubnetNode
 import networkx as nx
@@ -34,6 +35,9 @@ def build_subnet_graph(subnets: List[SubnetNode]) -> hnx.Hypergraph:
     edges: dict[str, Set[str]] = {}
 
     for subnet in subnets:
+        # Do not render root subnet
+        if subnet.network == ipaddress.IPv4Network("0.0.0.0/0"):
+            continue
         members = get_children(subnet)
 
         edges[str(subnet.network)] = members
