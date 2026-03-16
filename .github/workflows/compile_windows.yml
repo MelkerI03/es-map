@@ -26,8 +26,7 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          # Adjust main.py to your entrypoint
-          pyinstaller --onefile --name es-map src/es_map/cli.py
+          pyinstaller --onefile --hidden-import matplotlib.backends.backend_svg --name es-map src/es_map/cli.py
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v6
