@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Collection, Mapping
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -13,7 +13,7 @@ from hypernetx.drawing.rubber_band import (
 
 
 def render_hypergraph(
-    hyper_graph: hnx.Hypergraph, pos: Dict[str, Any], ax: Axes
+    hyper_graph: hnx.Hypergraph, pos: Mapping[str, Collection[float]], ax: Axes
 ) -> None:
     """Render a HyperNetX hypergraph on an existing matplotlib axis.
 
@@ -24,7 +24,7 @@ def render_hypergraph(
 
     Args:
         hyper_graph (hnx.Hypergraph): Hypergraph representing subnet groupings.
-        pos (Dict[str, Tuple[float, float]]): Mapping of node identifiers to layout positions.
+        pos (Mapping[str, Collection [float]]): Mapping of node identifiers to layout positions.
         ax (matplotlib.axes.Axes): Axis to render the hypergraph onto.
     """
 
@@ -55,7 +55,9 @@ def render_hypergraph(
     )
 
 
-def render_nx_graph(nx_graph: nx.Graph, pos: Dict[str, Any], ax: Axes):
+def render_nx_graph(
+    nx_graph: nx.Graph, pos: Mapping[str, Collection[float]], ax: Axes
+) -> None:
     """Render a NetworkX graph with labeled nodes on a matplotlib axis.
 
     Hosts are labeled with their hostname attribute if available, while
@@ -63,7 +65,7 @@ def render_nx_graph(nx_graph: nx.Graph, pos: Dict[str, Any], ax: Axes):
 
     Args:
         nx_graph (nx.Graph): Graph representing network topology.
-        pos (Dict[str, Tuple[float, float]]): Mapping of node identifiers to layout positions.
+        pos (Mapping[str, Collection[float]]): Mapping of node identifiers to layout positions.
         ax (matplotlib.axes.Axes): Axis to render the hypergraph onto.
     """
 
