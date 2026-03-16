@@ -111,20 +111,17 @@ class SubnetRegistry:
             candidates.append(subnet)
 
     def attach_host(self, host: Host) -> None:
-        """Attach a host to the most specific subnets that contain its IP addresses.
+        """Attach a host to the most specific subnet that contains any of its IPs.
 
         Args:
             host (Host): Host to attach.
         """
+        # Flatten and take best match
+        best_subnet = max(
+            (subnet for ip in host.ips for subnet in self.find_subnets_from_ip(ip)),
+            key=lambda s: s.network.prefixlen,
+            default=None,
+        )
 
-        for ip in host.ips:
-
-            matching = self.find_subnets_from_ip(ip)
-
-            if not matching:
-                continue
-
-            # choose most specific subnet
-            best = max(matching, key=lambda s: s.network.prefixlen)
-
-            best.add_host(host)
+        if best_subnet:
+            best_subnet.add_host(host)
