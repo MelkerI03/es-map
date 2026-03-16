@@ -1,3 +1,4 @@
+from math import sqrt
 from pathlib import Path
 from typing import Collection, Mapping
 from matplotlib.axes import Axes
@@ -74,13 +75,16 @@ def render_nx_graph(
         for node, attrs in nx_graph.nodes(data=True)
     }
 
+    # Size scaling with nodes
+    node_size = 2000 * 1 / sqrt(len(nx_graph.nodes))
+
     nx.draw(
         nx_graph,
         pos=pos,
         labels=hostnames,
         node_color="lightblue",
         edge_color="black",
-        node_size=800,
+        node_size=node_size,
         font_size=10,
         ax=ax,
         linewidths=1.5,
