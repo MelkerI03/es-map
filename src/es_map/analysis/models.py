@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address, IPv4Network
+import ipaddress
 from typing import List, Optional, Set, Dict
 import hashlib
 
@@ -69,8 +70,10 @@ class SubnetRegistry:
         Args:
             networks (List[IPv4Network]): List of IPv4Network objects to register.
         """
-        root_subnet = IPv4Network("0.0.0.0/0")
-        networks.append(root_subnet)
+        self.externally_connected = False
+
+        self.root_subnet = IPv4Network("0.0.0.0/0")
+        networks.append(self.root_subnet)
         self._subnets: Dict[IPv4Network, SubnetNode] = {
             net: SubnetNode(network=net) for net in networks
         }
@@ -113,15 +116,21 @@ class SubnetRegistry:
     def attach_host(self, host: Host) -> None:
         """Attach a host to the most specific subnet that contains any of its IPs.
 
+        If a host is not part of a defined network, the whole registry is flagged
+        as externally connected.
+
         Args:
             host (Host): Host to attach.
         """
         # Flatten and take best match
-        best_subnet = max(
+        max_subnet = max(
             (subnet for ip in host.ips for subnet in self.find_subnets_from_ip(ip)),
             key=lambda s: s.network.prefixlen,
-            default=None,
+            default=self._subnets[self.root_subnet],
         )
 
-        if best_subnet:
-            best_subnet.add_host(host)
+        if max_subnet.network == self.root_subnet:
+            self.externally_connected = True
+            return
+
+        max_subnet.add_host(host)
