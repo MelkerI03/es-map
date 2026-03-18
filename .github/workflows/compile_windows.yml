@@ -33,3 +33,16 @@ jobs:
         with:
           name: es-map
           path: dist\*.exe
+
+      - name: Debug filesystem
+        run: |
+          echo "Current working directory:"
+          cd
+          echo "Contents of current directory:"
+          dir
+          echo "Contents of dist folder (if exists):"
+          if exist dist (
+            dir dist
+          ) else (
+            echo "dist folder not found"
+          )
