@@ -26,13 +26,13 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller es-map.spec --distpath dist --workpath build
+          pyinstaller es-map.spec
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v6
         with:
           name: es-map
-          path: dist\*.exe
+          path: dist\es-map\es-map.exe
 
       - name: Debug filesystem
         run: |
