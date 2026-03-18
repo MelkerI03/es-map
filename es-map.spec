@@ -32,13 +32,3 @@ exe = EXE(
     upx=True,
     console=True,  # CLI app
 )
-
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    name='es-map',
-)
