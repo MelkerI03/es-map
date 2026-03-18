@@ -3,6 +3,7 @@ from pathlib import Path
 import networkx as nx
 
 from es_map.analysis.models import SubnetNode, SubnetRegistry
+from es_map.utils.paths import get_root_path
 
 
 def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict):
@@ -86,13 +87,16 @@ def render_web(
 
     data = export_graph(nx_graph, subnet_registry, pos)
 
+    template_file = get_root_path().joinpath(
+        "src", "es_map", "graph", "templates", "index.html"
+    )
+    static_file = get_root_path().joinpath(
+        "src", "es_map", "graph", "static", "graph.js"
+    )
+
+    (output_dir / "index.html").write_text(template_file.read_text())
+    (output_dir / "graph.js").write_text(static_file.read_text())
     # write JSON
     (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
-
-    template_dir = Path(__file__).parent / "templates"
-    (output_dir / "index.html").write_text((template_dir / "index.html").read_text())
-
-    static_dir = Path(__file__).parent / "static"
-    (output_dir / "graph.js").write_text((static_dir / "graph.js").read_text())
 
     print(f"\n✅ D3 visualization written to: {output_dir / 'index.html'}\n")
