@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: es-map
-          path: dist\es-map\es-map.exe
+          path: dist\es-map.exe
