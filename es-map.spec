@@ -24,7 +24,7 @@ exe = EXE(
     pyz,
     a.scripts,
     [],
-    exclude_binaries=True,
+    exclude_binaries=False,
     name='es-map',
     debug=False,
     bootloader_ignore_signals=False,
