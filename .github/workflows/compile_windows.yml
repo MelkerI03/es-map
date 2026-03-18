@@ -38,3 +38,5 @@ jobs:
         run: |
           echo "Looking for all exe files:"
           Get-ChildItem -Path . -Filter *.exe -Recurse -File
+          echo "Also"
+          Get-ChildItem -Path .dist -Filter *.exe -Recurse -File
