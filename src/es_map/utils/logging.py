@@ -15,23 +15,34 @@ DEFAULT_DATEFMT = "%Y-%m-%d %H:%M:%S"
 
 
 def setup_logging(
-    level: str = "INFO",
+    log_level: str = "INFO",
     log_file: str | Path | None = None,
 ) -> None:
     """
     Configure global logging for the application.
 
-    Must be called once from the CLI entrypoint.
+    This function initializes the root logger with a console handler and
+    optionally a file handler. Existing handlers are cleared to ensure
+    a clean configuration.
+
+    Note:
+        This should be called once from the application's CLI entrypoint.
+
+    Args:
+        level: Logging level as a string (e.g., "DEBUG", "INFO", "WARNING").
+        log_file: Optional path to a file where logs should be written.
+
+    Raises:
+        ValueError: If the provided logging level is invalid.
     """
-    numeric_level = getattr(logging, level.upper(), None)
+    numeric_level = getattr(logging, log_level.upper(), None)
     if not isinstance(numeric_level, int):
-        raise ValueError(f"Invalid log level: {level}")
+        raise ValueError(f"Invalid log level: {log_level}")
 
     root_logger = logging.getLogger()
     root_logger.setLevel(numeric_level)
 
-    if root_logger.handlers:
-        root_logger.handlers.clear()
+    root_logger.handlers.clear()
 
     formatter = logging.Formatter(
         fmt=DEFAULT_FORMAT,
