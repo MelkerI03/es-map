@@ -25,6 +25,7 @@ exe = EXE(
     a.scripts,
     a.binaries,
     a.zipfiles,
+    a.datas,
     [],
     exclude_binaries=False,
     name='es-map',
