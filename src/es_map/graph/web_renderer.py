@@ -9,6 +9,9 @@ import webbrowser
 
 from es_map.utils.file_handling import overwrite_copy
 from es_map.utils.paths import get_root_path
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def render_web(

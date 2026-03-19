@@ -8,6 +8,10 @@ cluster information and return structured Python data.
 from typing import Any, Dict, List
 from elasticsearch import Elasticsearch
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def fetch_hosts(client: Elasticsearch, index: str | None) -> List[Dict[str, Any]]:
     index = index or "*"  # If not defined, include all

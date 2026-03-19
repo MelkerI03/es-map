@@ -1,5 +1,9 @@
 from es_map.analysis.models import SubnetRegistry
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def assign_subnet_parents(registry: SubnetRegistry) -> None:
     """Assign parent relationships between subnets using CIDR containment."""

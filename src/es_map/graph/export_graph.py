@@ -1,6 +1,10 @@
 from typing import Any, Dict, List, Set
 from es_map.analysis.models import SubnetNode, SubnetRegistry
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def export_graph(subnet_registry: SubnetRegistry) -> Dict[str, List[Dict[str, Any]]]:
     """Export SubnetRegistry into a graph structure for rendering.

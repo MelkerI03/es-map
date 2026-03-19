@@ -5,6 +5,10 @@ nodes into good positions regardless
 
 import networkx as nx
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def build_nx_graph(data: dict) -> nx.Graph:
     G = nx.Graph()

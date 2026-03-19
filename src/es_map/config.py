@@ -3,6 +3,10 @@ import ipaddress
 from pathlib import Path
 from typing import List, Optional
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 @dataclass
 class ElasticConfig:

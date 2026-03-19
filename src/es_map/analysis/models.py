@@ -1,8 +1,11 @@
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address, IPv4Network
-import ipaddress
 from typing import List, Optional, Set, Dict
 import hashlib
+
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 @dataclass(eq=True)

@@ -2,6 +2,10 @@ from functools import lru_cache
 import sys
 from pathlib import Path
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 @lru_cache(maxsize=1)  # Cache for 'single' lookup
 def get_root_path() -> Path:

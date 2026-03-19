@@ -2,6 +2,10 @@ from typing import Any
 from elasticsearch import Elasticsearch
 from es_map.config import ElasticConfig
 
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def create_client(config: ElasticConfig) -> Elasticsearch:
     """Create an Elasticsearch client from the given configuration.
