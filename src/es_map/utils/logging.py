@@ -1,3 +1,10 @@
+"""
+Logging utilities for configuring and retrieving application loggers.
+
+This module provides a centralized logging configuration to ensure
+consistent formatting and handler setup across the application.
+"""
+
 import logging
 import sys
 from pathlib import Path
@@ -44,5 +51,13 @@ def setup_logging(
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Return a logger for a module."""
+    """
+    Retrieve a logger instance for a given module or component.
+
+    Args:
+        name: The name of the logger, typically __name__.
+
+    Returns:
+        A configured logger instance.
+    """
     return logging.getLogger(name)
