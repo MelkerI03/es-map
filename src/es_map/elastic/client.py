@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 from elasticsearch import Elasticsearch
 from es_map.config import ElasticConfig
 
@@ -48,15 +48,3 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
     client = Elasticsearch(**kwargs)
 
     return client
-
-
-# TODO: Dev function, not a function to be used under production. Should be removed
-def get_hosts(client: Elasticsearch, index: str) -> List[str]:
-    response = client.search(
-        index=index,
-        size=0,
-        aggs={"hosts": {"terms": {"field": "host.name", "size": 1000}}},
-    )
-
-    buckets = response.body["aggregations"]["hosts"]["buckets"]
-    return [bucket["key"] for bucket in buckets]

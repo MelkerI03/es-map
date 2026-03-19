@@ -92,17 +92,19 @@ def render_web(
     data = export_graph(nx_graph, subnet_registry, pos)
 
     template_file = get_root_path().joinpath("graph/templates/index.html")
-    static_file = get_root_path().joinpath("graph/static/graph.js")
+    graph_file = get_root_path().joinpath("graph/static/graph.js")
+    d3_file = get_root_path().joinpath("graph/static/d3.v7.min.js")
 
     (output_dir / "index.html").write_text(template_file.read_text())
-    (output_dir / "graph.js").write_text(static_file.read_text())
+    (output_dir / "graph.js").write_text(graph_file.read_text())
+    (output_dir / "d3.v7.min.js").write_text(d3_file.read_text())
     # write JSON
     (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
 
     print(f"\n✅ D3 visualization written to: {output_dir / 'index.html'}\n")
 
 
-def serve_directory(directory: Path, port: int = 8000) -> None:
+def serve_directory(directory: Path, port: int = 8097) -> None:
     """Serve a directory over HTTP and open it in the default browser.
 
     Args:
