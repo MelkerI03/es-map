@@ -5,8 +5,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('src/es_map/graph/templates', 'src/es_map/graph/templates'),
-        ('src/es_map/graph/static', 'src/es_map/graph/static'),
+        ('src/es_map/graph', 'graph'),
     ],
     hiddenimports=[
         'matplotlib.backends.backend_svg',

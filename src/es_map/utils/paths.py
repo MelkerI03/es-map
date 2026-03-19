@@ -11,7 +11,8 @@ def get_root_path() -> Path:
     Get a path the project root
     """
     if hasattr(sys, "_MEIPASS"):
-        path = Path(sys._MEIPASS)  # pyright: ignore[reportAttributeAccessIssue]
+        # path = Path(sys._MEIPASS)  # pyright: ignore[reportAttributeAccessIssue]
+        path = ROOT_DIR
     else:
         path = ROOT_DIR
 
