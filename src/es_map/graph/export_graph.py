@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Set
-from es_map.analysis.models import SubnetNode, SubnetRegistry
+from es_map.analysis.models import Subnet, SubnetRegistry
 from es_map.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -85,7 +85,7 @@ def export_graph(subnet_registry: SubnetRegistry) -> Dict[str, List[Dict[str, An
                 }
             )
 
-    def collect_members(node: SubnetNode) -> Set[str]:
+    def collect_members(node: Subnet) -> Set[str]:
         members: Set[str] = set()
 
         members.add(node.router_id)

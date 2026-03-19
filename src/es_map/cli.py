@@ -186,7 +186,7 @@ def main(
     registry = SubnetRegistry(parsed_subnets)
 
     for host in hosts:
-        registry.attach_host(host)
+        registry.assign_host_to_subnet(host)
 
     data = export_graph(registry)
     G = build_nx_graph(data)
