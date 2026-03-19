@@ -13,8 +13,8 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 
-from es_map.graph.builder import build_subnet_graph, build_topology_graph
-from es_map.graph.renderer import render_overlay
+from es_map.graph.builder import build_topology_graph
+from es_map.graph.web_renderer import render_web, serve_directory
 from es_map.utils.logging import get_logger, setup_logging
 
 
@@ -130,8 +130,6 @@ def main(
     """
     Elasticsearch Network Mapper CLI
     """
-    print("Hello World")
-
     setup_logging(level=log_level, log_file=log_file)
 
     logger.info("Starting Elasticsearch Network Mapper")
@@ -190,10 +188,14 @@ def main(
     registry_subnets = list(registry._subnets.values())
     logger.debug(f"registry subnets: {registry_subnets}")
 
-    subnet_graph = build_subnet_graph(registry_subnets)
+    # subnet_graph = build_subnet_graph(registry_subnets)
     topo_graph = build_topology_graph(registry_subnets)
 
-    render_overlay(topo_graph, subnet_graph, output)
+    # render_overlay(topo_graph, subnet_graph, output)
+    out_dir = Path("./out")
+    render_web(topo_graph, registry, out_dir)
+
+    serve_directory(out_dir)
 
     logger.info("Finished successfully")
 
@@ -209,10 +211,10 @@ def main(
     for edge in topo_graph.edges():
         print(edge)
 
-    print("\n------------subnet edges---------------\n")
-    for edge in subnet_graph.edges:
-        members = subnet_graph.edges[edge]
-        print(f"{edge}: {members}")
+    # print("\n------------subnet edges---------------\n")
+    # for edge in subnet_graph.edges:
+    #     members = subnet_graph.edges[edge]
+    #     print(f"{edge}: {members}")
 
     print("\n------------hosts ips---------------\n")
     for host in hosts:

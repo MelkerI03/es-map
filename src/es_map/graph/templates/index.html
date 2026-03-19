@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Network Graph</title>
+  <script src="d3.v7.min.js"></script>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    svg { width: 100vw; height: 100vh; }
+
+    .node {
+      stroke: #333;
+      stroke-width: 1px;
+    }
+
+    .host {
+      fill: #66b2ff;
+    }
+
+    .router {
+      fill: #ffcc66;
+    }
+
+    .edge {
+      stroke: #555;
+      stroke-width: 1.5px;
+    }
+
+    .subnet {
+      fill: lightblue;
+      opacity: 0.2;
+      stroke: #3399ff;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<svg id="graph"></svg>
+<script src="graph.js"></script>
+
+</body>
+</html>
