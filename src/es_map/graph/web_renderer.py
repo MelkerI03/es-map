@@ -11,8 +11,6 @@ from es_map.utils.paths import get_root_path
 
 
 def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict):
-    print("\n=== EXPORT GRAPH (D3 MODE) ===\n")
-
     nodes = []
     edges = []
     subnets = []
@@ -37,12 +35,9 @@ def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict)
             }
         )
 
-        print(f"Node: {node_id} ({node_type}) @ {x:.2f}, {y:.2f}")
-
     # --- Edges
     for u, v in nx_graph.edges():
         edges.append({"source": str(u), "target": str(v)})
-        print(f"Edge: {u} -> {v}")
 
     # --- Subnets
     for subnet in subnet_registry._subnets.values():
@@ -67,11 +62,6 @@ def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict)
             }
         )
 
-        for s in subnets:
-            print(f"sub {s} has members: {members}")
-
-        print(f"Subnet: {subnet.network} -> {len(members)} members")
-
     return {
         "nodes": nodes,
         "edges": edges,
@@ -95,13 +85,12 @@ def render_web(
     graph_file = get_root_path().joinpath("graph/static/graph.js")
     d3_file = get_root_path().joinpath("graph/static/d3.v7.min.js")
 
+    # Move files to out
     (output_dir / "index.html").write_text(template_file.read_text())
     (output_dir / "graph.js").write_text(graph_file.read_text())
     (output_dir / "d3.v7.min.js").write_text(d3_file.read_text())
-    # write JSON
-    (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
 
-    print(f"\n✅ D3 visualization written to: {output_dir / 'index.html'}\n")
+    (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
 
 
 def serve_directory(directory: Path, port: int = 8097) -> None:
@@ -119,7 +108,6 @@ def serve_directory(directory: Path, port: int = 8097) -> None:
     httpd = socketserver.TCPServer(("localhost", port), Handler)
 
     def run_server():
-        print(f"Serving at http://localhost:{port}")
         httpd.serve_forever()
 
     thread = threading.Thread(target=run_server, daemon=True)
@@ -131,4 +119,3 @@ def serve_directory(directory: Path, port: int = 8097) -> None:
         input("Press ENTER to stop the server...\n")
     finally:
         httpd.shutdown()
-        print("Server stopped.")

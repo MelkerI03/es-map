@@ -130,8 +130,6 @@ def main(
     """
     Elasticsearch Network Mapper CLI
     """
-    print("Hello World")
-
     setup_logging(level=log_level, log_file=log_file)
 
     logger.info("Starting Elasticsearch Network Mapper")

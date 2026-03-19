@@ -116,4 +116,3 @@ def render_overlay(
 
     plt.tight_layout()
     plt.savefig(output)
-    print(f"Overlay rendered to {output}")
