@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Set
 from es_map.analysis.models import SubnetNode, SubnetRegistry
-
 from es_map.utils.logging import get_logger
 
 logger = get_logger(__name__)

@@ -4,7 +4,7 @@ import typer
 from dotenv import load_dotenv
 from typing import List, Optional
 
-from es_map.analysis.ingest import build_hosts_from_es
+from es_map.analysis.ingest import build_hosts
 from es_map.analysis.models import SubnetRegistry
 from es_map.config import (
     ConfigError,
@@ -181,7 +181,7 @@ def main(
         raise typer.Exit(code=1)
 
     # --- Collect network data ---
-    hosts = build_hosts_from_es(client, config.index)
+    hosts = build_hosts(client, config.index)
 
     registry = SubnetRegistry(parsed_subnets)
 
