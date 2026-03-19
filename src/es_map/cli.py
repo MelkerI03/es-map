@@ -1,4 +1,5 @@
 from pathlib import Path
+import networkx as nx
 import typer
 from dotenv import load_dotenv
 from typing import List, Optional
@@ -13,6 +14,7 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 
+from es_map.graph.builder import apply_layout, build_nx_graph
 from es_map.graph.export_graph import export_graph
 from es_map.graph.web_renderer import render_web, serve_directory
 from es_map.utils.logging import get_logger, setup_logging
@@ -186,7 +188,11 @@ def main(
     for host in hosts:
         registry.attach_host(host)
 
-    network_data = export_graph(registry)
+    data = export_graph(registry)
+    G = build_nx_graph(data)
+    layout = nx.spring_layout(G, seed=42)
+
+    network_data = apply_layout(data, layout)
 
     # --- Render in browser ---
     out_dir = Path("./out")
