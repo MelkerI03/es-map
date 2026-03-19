@@ -15,7 +15,7 @@ def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict)
     edges = []
     subnets = []
 
-    # --- Nodes
+    # Nodes
     for node, data in nx_graph.nodes(data=True):
         id_map = {node: str(node) for node in nx_graph.nodes()}
         node_id = id_map[node]
@@ -35,11 +35,11 @@ def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict)
             }
         )
 
-    # --- Edges
+    # Edges
     for u, v in nx_graph.edges():
         edges.append({"source": str(u), "target": str(v)})
 
-    # --- Subnets
+    # Subnets
     for subnet in subnet_registry._subnets.values():
         if str(subnet.network) == "0.0.0.0/0":
             continue
