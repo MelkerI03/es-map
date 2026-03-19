@@ -6,13 +6,13 @@ d3.json("graph.json").then(data => {
 
   const nodeMap = new Map(data.nodes.map(d => [d.id, d]));
 
-  // --- Define forces
+  // Define forces
   const simulation = d3.forceSimulation(data.nodes)
     .force("link", d3.forceLink(data.edges).id(d => d.id).distance(200))
     .force("charge", d3.forceManyBody().strength(-200))
     .force("center", d3.forceCenter(width / 2, height / 2))
 
-  // --- Draw edges
+  // Draw edges
   const edges = svg.selectAll(".edge")
     .data(data.edges)
     .enter()
@@ -21,7 +21,7 @@ d3.json("graph.json").then(data => {
     .attr("stroke", "#555")
     .attr("stroke-width", 2);
 
-  // --- Draw subnet hulls
+  // Draw subnet hulls
   const line = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.75));
   function padHull(hull, padding) {
     const cx = d3.mean(hull, d => d[0]);
@@ -44,7 +44,7 @@ d3.json("graph.json").then(data => {
     .attr("stroke-width", 2)
     .attr("fill-opacity", 0.2);
 
-  // --- Draw nodes
+  // Draw nodes
   const nodes = svg.selectAll(".node")
     .data(data.nodes)
     .enter()
@@ -57,7 +57,7 @@ d3.json("graph.json").then(data => {
       .on("end", dragended)
     );
 
-  // --- Draw labels
+  // Draw labels
   const labels = svg.selectAll(".label")
     .data(data.nodes)
     .enter()
@@ -67,22 +67,23 @@ d3.json("graph.json").then(data => {
     .style("font-size", "15px")
     .text(d => d.type === "host" ? d.label : "router");
 
-  // --- Update positions on each tick
+  // Update positions on each tick
   simulation.on("tick", () => {
-    // --- Update nodes and their labels
+    // Update nodes
     nodes.attr("cx", d => d.x)
       .attr("cy", d => d.y);
 
+    // Update node labels
     labels.attr("x", d => d.x)
       .attr("y", d => d.y + 50);
 
-    // --- Update edges
+    // Update edges
     edges.attr("x1", d => nodeMap.get(d.source.id).x)
       .attr("y1", d => nodeMap.get(d.source.id).y)
       .attr("x2", d => nodeMap.get(d.target.id).x)
       .attr("y2", d => nodeMap.get(d.target.id).y);
 
-    // --- Update subnet paths
+    // Update subnet paths
     subnetPaths.attr("d", d => {
       const points = d.members
         .map(id => nodeMap.get(id))
@@ -98,7 +99,6 @@ d3.json("graph.json").then(data => {
     });
   });
 
-  // --- Drag functions
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
