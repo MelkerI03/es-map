@@ -93,7 +93,7 @@ d3.json("graph.json").then(data => {
       const hull = d3.polygonHull(points);
       if (!hull) return null;
 
-      const padded = padHull(hull, 50); // subnet padding
+      const padded = padHull(hull, 80); // subnet padding
       return line(padded);
     });
   });
