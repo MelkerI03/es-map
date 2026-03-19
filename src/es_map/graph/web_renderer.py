@@ -1,5 +1,9 @@
+import http.server
 import json
 from pathlib import Path
+import socketserver
+import threading
+import webbrowser
 import networkx as nx
 
 from es_map.analysis.models import SubnetNode, SubnetRegistry
@@ -87,12 +91,8 @@ def render_web(
 
     data = export_graph(nx_graph, subnet_registry, pos)
 
-    template_file = get_root_path().joinpath(
-        "src", "es_map", "graph", "templates", "index.html"
-    )
-    static_file = get_root_path().joinpath(
-        "src", "es_map", "graph", "static", "graph.js"
-    )
+    template_file = get_root_path().joinpath("graph/templates/index.html")
+    static_file = get_root_path().joinpath("graph/static/graph.js")
 
     (output_dir / "index.html").write_text(template_file.read_text())
     (output_dir / "graph.js").write_text(static_file.read_text())
@@ -100,3 +100,33 @@ def render_web(
     (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
 
     print(f"\n✅ D3 visualization written to: {output_dir / 'index.html'}\n")
+
+
+def serve_directory(directory: Path, port: int = 8000) -> None:
+    """Serve a directory over HTTP and open it in the default browser.
+
+    Args:
+        directory (Path): Directory to serve.
+        port (int): Port to bind the server to.
+    """
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(directory), **kwargs)
+
+    httpd = socketserver.TCPServer(("localhost", port), Handler)
+
+    def run_server():
+        print(f"Serving at http://localhost:{port}")
+        httpd.serve_forever()
+
+    thread = threading.Thread(target=run_server, daemon=True)
+    thread.start()
+
+    webbrowser.open(f"http://localhost:{port}")
+
+    try:
+        input("Press ENTER to stop the server...\n")
+    finally:
+        httpd.shutdown()
+        print("Server stopped.")

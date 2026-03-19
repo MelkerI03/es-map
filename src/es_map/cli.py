@@ -13,9 +13,8 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 
-from es_map.graph.builder import build_subnet_graph, build_topology_graph
-from es_map.graph.renderer import render_overlay
-from es_map.graph.web_renderer import render_web
+from es_map.graph.builder import build_topology_graph
+from es_map.graph.web_renderer import render_web, serve_directory
 from es_map.utils.logging import get_logger, setup_logging
 
 
@@ -195,7 +194,10 @@ def main(
     topo_graph = build_topology_graph(registry_subnets)
 
     # render_overlay(topo_graph, subnet_graph, output)
-    render_web(topo_graph, registry, Path("./out"))
+    out_dir = Path("./out")
+    render_web(topo_graph, registry, out_dir)
+
+    serve_directory(out_dir)
 
     logger.info("Finished successfully")
 
