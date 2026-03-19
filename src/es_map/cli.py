@@ -13,7 +13,7 @@ from es_map.config import (
 )
 from es_map.elastic.client import create_client
 
-from es_map.graph.builder import build_topology_graph
+from es_map.graph.export_graph import export_graph
 from es_map.graph.web_renderer import render_web, serve_directory
 from es_map.utils.logging import get_logger, setup_logging
 
@@ -126,7 +126,7 @@ def main(
         "--log-file",
         help="Optional log file path",
     ),
-):
+) -> None:
     """
     Elasticsearch Network Mapper CLI
     """
@@ -178,6 +178,7 @@ def main(
         )
         raise typer.Exit(code=1)
 
+    # --- Collect network data ---
     hosts = build_hosts_from_es(client, config.index)
 
     registry = SubnetRegistry(parsed_subnets)
@@ -185,42 +186,16 @@ def main(
     for host in hosts:
         registry.attach_host(host)
 
-    registry_subnets = list(registry._subnets.values())
-    logger.debug(f"registry subnets: {registry_subnets}")
+    network_data = export_graph(registry)
 
-    # subnet_graph = build_subnet_graph(registry_subnets)
-    topo_graph = build_topology_graph(registry_subnets)
-
-    # render_overlay(topo_graph, subnet_graph, output)
+    # --- Render in browser ---
     out_dir = Path("./out")
-    render_web(topo_graph, registry, out_dir)
 
+    render_web(network_data, out_dir)
     serve_directory(out_dir)
 
+    # --- Finish ---
     logger.info("Finished successfully")
-
-    # -------------------------------------------------
-    # TODO: DEBUGGING TOOLS
-    # -------------------------------------------------
-
-    print("\n------------topo nodes------------\n")
-    for node, attrs in topo_graph.nodes(data=True):
-        print(node, attrs)
-
-    print("\n------------topo edges------------\n")
-    for edge in topo_graph.edges():
-        print(edge)
-
-    # print("\n------------subnet edges---------------\n")
-    # for edge in subnet_graph.edges:
-    #     members = subnet_graph.edges[edge]
-    #     print(f"{edge}: {members}")
-
-    print("\n------------hosts ips---------------\n")
-    for host in hosts:
-        hostname = host.hostname
-        ips = host.ips
-        print(f"{hostname}: {ips}")
 
 
 if __name__ == "__main__":

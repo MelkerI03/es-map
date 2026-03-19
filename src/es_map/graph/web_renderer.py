@@ -2,98 +2,46 @@ import http.server
 import json
 from pathlib import Path
 import socketserver
+import sys
 import threading
+from typing import Any, Dict, List
 import webbrowser
-import networkx as nx
 
-from es_map.analysis.models import SubnetNode, SubnetRegistry
+from es_map.utils.file_handling import overwrite_copy
 from es_map.utils.paths import get_root_path
 
 
-def export_graph(nx_graph: nx.Graph, subnet_registry: SubnetRegistry, pos: dict):
-    nodes = []
-    edges = []
-    subnets = []
-
-    # Nodes
-    for node, data in nx_graph.nodes(data=True):
-        id_map = {node: str(node) for node in nx_graph.nodes()}
-        node_id = id_map[node]
-
-        x, y = pos[node_id]
-
-        node_type = data.get("type", "host")
-        hostname = data.get("hostname")
-
-        nodes.append(
-            {
-                "id": str(node_id),
-                "label": data.get("label", str(hostname)),
-                "type": node_type,
-                "x": float(x) * 800,
-                "y": float(y) * 800,
-            }
-        )
-
-    # Edges
-    for u, v in nx_graph.edges():
-        edges.append({"source": str(u), "target": str(v)})
-
-    # Subnets
-    for subnet in subnet_registry._subnets.values():
-        if str(subnet.network) == "0.0.0.0/0":
-            continue
-        members = set()
-
-        # collect hosts recursively
-        def collect(node: SubnetNode):
-            members.update(h.host_id for h in node.hosts)
-            members.add(node.router_id)
-            for child in node.child_subnets:
-                collect(child)
-
-        collect(subnet)
-
-        subnets.append(
-            {
-                "id": str(subnet.network),
-                "label": str(subnet.network),
-                "members": list(members),
-            }
-        )
-
-    return {
-        "nodes": nodes,
-        "edges": edges,
-        "subnets": subnets,
-    }
-
-
 def render_web(
-    nx_graph: nx.Graph,
-    subnet_registry: SubnetRegistry,
+    network_data: Dict[str, List[Dict[str, Any]]],
     output_dir: Path,
-):
-    if not output_dir.exists():
-        output_dir.mkdir(parents=True, exist_ok=True)
+) -> None:
+    """Render the subnet graph as a local web visualization.
 
-    pos = nx.spring_layout(nx_graph, seed=42)
+    This function:
+        1. Exports the data into graph.json
+        2. Copies static assets into the output directory
 
-    data = export_graph(nx_graph, subnet_registry, pos)
+    Args:
+        network_data (dict): Source of truth for the network graph.
+        output_dir (Path): Directory where web assets will be written.
+    """
 
-    template_file = get_root_path().joinpath("graph/templates/index.html")
-    graph_file = get_root_path().joinpath("graph/static/graph.js")
-    d3_file = get_root_path().joinpath("graph/static/d3.v7.min.js")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Move files to out
-    (output_dir / "index.html").write_text(template_file.read_text())
-    (output_dir / "graph.js").write_text(graph_file.read_text())
-    (output_dir / "d3.v7.min.js").write_text(d3_file.read_text())
+    (output_dir / "graph.json").write_text(
+        json.dumps(network_data, indent=2), encoding="utf-8"
+    )
 
-    (output_dir / "graph.json").write_text(json.dumps(data, indent=2))
+    root_path = get_root_path()
+    static_dir = root_path / "graph/static"
+    templates_dir = root_path / "graph/templates"
+
+    overwrite_copy(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
+    overwrite_copy(static_dir / "graph.js", output_dir / "graph.js")
+    overwrite_copy(templates_dir / "index.html", output_dir / "index.html")
 
 
-def serve_directory(directory: Path, port: int = 8097) -> None:
+def serve_directory(directory: Path, port: int = 8000) -> None:
     """Serve a directory over HTTP and open it in the default browser.
 
     Args:
@@ -105,7 +53,11 @@ def serve_directory(directory: Path, port: int = 8097) -> None:
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=str(directory), **kwargs)
 
-    httpd = socketserver.TCPServer(("localhost", port), Handler)
+    # Skip TIME_WAIT on TCP close
+    class ReuseAddrTCPServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    httpd = ReuseAddrTCPServer(("localhost", port), Handler)
 
     def run_server():
         httpd.serve_forever()
@@ -119,3 +71,5 @@ def serve_directory(directory: Path, port: int = 8097) -> None:
         input("Press ENTER to stop the server...\n")
     finally:
         httpd.shutdown()
+        httpd.server_close()
+        sys.exit(0)
