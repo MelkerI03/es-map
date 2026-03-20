@@ -218,13 +218,13 @@ def main(
     graph = build_nx_graph(graph_data)
     layout = nx.spring_layout(graph, seed=42)
 
-    network_data = apply_layout(graph_data, layout)
+    apply_layout(graph_data, layout)
 
     # --- Render in browser ---
     out_dir = Path("./out")
     logger.info("Rendering network graph", extra={"output_dir": str(out_dir)})
 
-    render_web(network_data, out_dir)
+    render_web(graph_data, out_dir)
     serve_directory(out_dir)
 
     # --- Finish ---
