@@ -1,15 +1,46 @@
+/**
+ * Graph visualization using D3.js.
+ *
+ * Renders a force-directed network graph from graph.json,
+ * including:
+ * - Nodes (hosts and routers)
+ * - Edges between nodes
+ * - Subnet group hulls
+ *
+ * Handles layout simulation, dragging, and dynamic updates.
+ */
+
 const svg = d3.select("#graph");
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+const CONFIG = {
+  linkDistance: 200,
+  chargeStrength: -200,
+  nodeRadius: 30,
+  subnetPadding: 80,
+  labelOffsetY: 50,
+};
+
 d3.json("graph.json").then(data => {
+
+  if (!data.nodes || !data.edges) {
+    console.error("Invalid graph data format", data);
+    return;
+  }
+
+  console.debug("Graph data loaded", {
+    nodes: data.nodes.length,
+    edges: data.edges.length,
+    subnets: data.subnets.length,
+  });
 
   const nodeMap = new Map(data.nodes.map(d => [d.id, d]));
 
   // Define forces
   const simulation = d3.forceSimulation(data.nodes)
-    .force("link", d3.forceLink(data.edges).id(d => d.id).distance(200))
-    .force("charge", d3.forceManyBody().strength(-200))
+    .force("link", d3.forceLink(data.edges).id(d => d.id).distance(CONFIG.linkDistance))
+    .force("charge", d3.forceManyBody().strength(CONFIG.chargeStrength))
     .force("center", d3.forceCenter(width / 2, height / 2))
 
   // Draw edges
@@ -22,7 +53,15 @@ d3.json("graph.json").then(data => {
     .attr("stroke-width", 2);
 
   // Draw subnet hulls
-  const line = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.75));
+  const hullLineGenerator = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.75));
+
+  /**
+   * Expand a convex hull outward by a given padding.
+   *
+   * @param {Array<[number, number]>} hull - Array of [x, y] points.
+   * @param {number} padding - Distance to expand outward.
+   * @returns {Array<[number, number]>} Padded hull points.
+   */
   function padHull(hull, padding) {
     const cx = d3.mean(hull, d => d[0]);
     const cy = d3.mean(hull, d => d[1]);
@@ -50,7 +89,7 @@ d3.json("graph.json").then(data => {
     .enter()
     .append("circle")
     .attr("class", d => `node ${d.type}`)
-    .attr("r", 30)
+    .attr("r", CONFIG.nodeRadius)
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
@@ -75,7 +114,7 @@ d3.json("graph.json").then(data => {
 
     // Update node labels
     labels.attr("x", d => d.x)
-      .attr("y", d => d.y + 50);
+      .attr("y", d => d.y + CONFIG.labelOffsetY);
 
     // Update edges
     edges.attr("x1", d => nodeMap.get(d.source.id).x)
@@ -87,29 +126,38 @@ d3.json("graph.json").then(data => {
     subnetPaths.attr("d", d => {
       const points = d.members
         .map(id => nodeMap.get(id))
-        .filter(Boolean)
-        .map(n => [n.x, n.y]);
+        .filter(node => node)
+        .map(node => [node.x, node.y]);
       if (points.length < 3) return null;
 
       const hull = d3.polygonHull(points);
       if (!hull) return null;
 
-      const padded = padHull(hull, 80); // subnet padding
-      return line(padded);
+      const padded = padHull(hull, CONFIG.subnetPadding);
+      return hullLineGenerator(padded);
     });
   });
 
+  /**
+   * Handle drag start event.
+   */
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
   }
 
+  /**
+   * Handle dragging event.
+   */
   function dragged(event, d) {
     d.fx = event.x;
     d.fy = event.y;
   }
 
+  /**
+   * Handle drag end event.
+   */
   function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
     d.fx = null;
