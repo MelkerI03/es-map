@@ -9,6 +9,7 @@ dependencies = [
   "hypernetx>=2.4.0",
   "networkx>=3.6.1",
   "pandas<3",
+  "pydantic>=2.12.5",
   "python-dotenv>=1.2.2",
   "typer>=0.24.1",
 ]
