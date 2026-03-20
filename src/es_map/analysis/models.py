@@ -84,8 +84,7 @@ class Subnet:
 
 
 class SubnetRegistry:
-    """
-    Registry for managing subnet hierarchy and host assignments.
+    """Registry for managing subnet hierarchy and host assignments.
 
     This class organizes subnets into a hierarchy and provides
     functionality to assign hosts to the most specific matching subnet.

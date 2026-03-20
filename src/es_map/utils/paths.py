@@ -9,9 +9,7 @@ logger = get_logger(__name__)
 
 @lru_cache(maxsize=1)  # Cache for 'single' lookup
 def get_root_path() -> Path:
-    """
-    Get path to the project root
-    """
+    """Get path to the project root"""
     if hasattr(sys, "_MEIPASS"):
         path = Path(sys._MEIPASS)  # pyright: ignore[reportAttributeAccessIssue]
     else:

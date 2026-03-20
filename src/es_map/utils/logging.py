@@ -1,5 +1,4 @@
-"""
-Logging utilities for configuring and retrieving application loggers.
+"""Logging utilities for configuring and retrieving application loggers.
 
 This module provides a centralized logging configuration to ensure
 consistent formatting and handler setup across the application.
@@ -18,8 +17,7 @@ def setup_logging(
     log_level: str = "INFO",
     log_file: str | Path | None = None,
 ) -> None:
-    """
-    Configure global logging for the application.
+    """Configure global logging for the application.
 
     This function initializes the root logger with a console handler and
     optionally a file handler. Existing handlers are cleared to ensure
@@ -62,8 +60,7 @@ def setup_logging(
 
 
 def get_logger(name: str) -> logging.Logger:
-    """
-    Retrieve a logger instance for a given module or component.
+    """Retrieve a logger instance for a given module or component.
 
     Args:
         name: The name of the logger, typically __name__.

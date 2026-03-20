@@ -1,5 +1,4 @@
-"""
-Elasticsearch client utilities.
+"""Elasticsearch client utilities.
 
 The client is constructed as a thin wrapper around the official
 Elasticsearch Python client, translating configuration values into
@@ -15,8 +14,7 @@ logger = get_logger(__name__)
 
 
 def create_client(config: ElasticConfig) -> Elasticsearch:
-    """
-    Create an Elasticsearch client from the given configuration.
+    """Create an Elasticsearch client from the given configuration.
 
     Supports HTTP/HTTPS, certificate verification, custom CA bundles,
     mutual TLS (mTLS), API key authentication, and basic authentication.

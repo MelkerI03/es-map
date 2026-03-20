@@ -1,5 +1,4 @@
-"""
-Command-line interface for the Elasticsearch Network Mapper.
+"""Command-line interface for the Elasticsearch Network Mapper.
 
 This module orchestrates configuration, data ingestion, graph
 construction, and rendering of a network topology visualization.
@@ -130,8 +129,7 @@ def main(
         help="Optional log file path",
     ),
 ) -> None:
-    """
-    Elasticsearch Network Mapper CLI.
+    """Elasticsearch Network Mapper CLI.
 
     This command-line interface connects to an Elasticsearch cluster,
     retrieves host data, builds a subnet hierarchy, and generates
