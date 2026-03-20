@@ -1,5 +1,4 @@
-"""
-Web rendering and serving utilities for graph visualization.
+"""Web rendering and serving utilities for graph visualization.
 
 This module handles exporting graph data to static assets and
 serving them via a lightweight local HTTP server for browser-based

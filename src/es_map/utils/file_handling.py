@@ -1,5 +1,4 @@
-"""
-File handling utilities for safe and consistent filesystem operations.
+"""File handling utilities for safe and consistent filesystem operations.
 
 This module provides helper functions for copying and managing files.
 """
@@ -13,8 +12,7 @@ logger = get_logger(__name__)
 
 
 def overwrite_copy(src: Path, dst: Path) -> None:
-    """
-    Copy a file to a destination, overwriting it if it already exists.
+    """Copy a file to a destination, overwriting it if it already exists.
 
     If the destination file is locked or cannot be removed, the operation
     is skipped.
