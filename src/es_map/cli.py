@@ -16,7 +16,7 @@ from es_map.analysis.models import SubnetRegistry
 from es_map.config import (
     ConfigError,
     ElasticConfig,
-    parse_and_validate_subnets,
+    parse_subnets,
     validate_config,
 )
 from es_map.elastic.client import create_client
@@ -171,7 +171,7 @@ def main(
     )
 
     try:
-        parsed_subnets = parse_and_validate_subnets(subnet_cidrs)
+        parsed_subnets = parse_subnets(subnet_cidrs)
         logger.info("Parsed subnets", extra={"count": len(parsed_subnets)})
     except (ValueError, AssertionError) as e:
         logger.error("Invalid subnet input: %s", e)
