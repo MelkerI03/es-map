@@ -1,20 +1,29 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address, IPv4Network
-import ipaddress
-from typing import List, Optional, Set, Dict
 import hashlib
+
+from es_map.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 @dataclass(eq=True)
 class Host:
-    """Represents a network host with an identifier, optional hostname, and IP addresses."""
+    """Represents a network host.
+
+    Attributes:
+        host_id (str): Unique identifier for the host.
+        hostname (str): Optional human-readable hostname.
+        ip_addresses (set[IPv4Address]): Set of IPv4 addresses assigned to the host.
+        child_subnets (list[Subnet]): Virtual subnets owned by this host.
+    """
 
     host_id: str
     hostname: str | None = None
-    ips: Set[IPv4Address] = field(default_factory=set)
-    child_subnets: List["SubnetNode"] = field(
-        default_factory=list
-    )  # For virtual subnets
+    ip_addresses: set[IPv4Address] = field(default_factory=set)
+    child_subnets: list["Subnet"] = field(default_factory=list)  # For virtual subnets
 
     def __hash__(self) -> int:
         """Compute hash based on host_id."""
@@ -24,21 +33,26 @@ class Host:
         """Add an IP address to the host.
 
         Args:
-            ip (IPv4Address): IP address to add.
+            ip: IP address to add.
         """
-        self.ips.add(ip)
+        self.ip_addresses.add(ip)
 
 
 @dataclass
-class SubnetNode:
-    """Represents a subnet and the hosts that belong to it."""
+class Subnet:
+    """Represents a subnet in a hierarchical network structure.
+
+    Attributes:
+        network (IPv4Network): The IPv4 network represented by this node.
+        hosts (list[Host]): Hosts assigned to this subnet.
+        parent (Subnet | None): Parent subnet in the hierarchy.
+        child_subnets (list[Subnet]): Nested subnets within this subnet.
+    """
 
     network: IPv4Network
-    hosts: Set[Host] = field(default_factory=set)
-    parent: Optional["SubnetNode"] = field(
-        default=None, repr=False, compare=False
-    )  # TODO: add Union[Host, SubnetNode] so that virtual subnets can be owned by a host
-    child_subnets: List["SubnetNode"] = field(default_factory=list, repr=False)
+    hosts: set[Host] = field(default_factory=set)
+    parent: Subnet | None = field(default=None, repr=False, compare=False)
+    child_subnets: list["Subnet"] = field(default_factory=list, repr=False)
 
     def add_host(self, host: Host) -> None:
         """Add a host to the subnet.
@@ -48,23 +62,35 @@ class SubnetNode:
         """
         self.hosts.add(host)
 
-    # TODO: Discern different NAT'ed subnet ids from eachother. Might be 2 different 10.0.2.0/24 subnets in the same network.
     @property
-    def network_id(self) -> str:
-        """A stable hashed identifier for this subnet."""
-        raw = str(self.network).encode("utf-8")
-        digest = hashlib.sha256(raw).hexdigest()
+    def subnet_id(self) -> str:
+        """Generate a stable identifier for the subnet.
+
+        Returns:
+            A deterministic hash-based identifier derived from the network.
+        """
+        network_bytes = str(self.network).encode("utf-8")
+        digest = hashlib.sha256(network_bytes).hexdigest()
         return f"subnet:{digest[:12]}"
 
     @property
     def router_id(self) -> str:
-        return f"router:{self.network_id}"
+        """Generate a router identifier associated with this subnet.
+
+        Returns:
+            A string identifier prefixed with 'router:'.
+        """
+        return f"router:{self.subnet_id}"
 
 
 class SubnetRegistry:
-    """Registry that maps subnets to their respective hosts."""
+    """Registry for managing subnet hierarchy and host assignments.
 
-    def __init__(self, networks: List[IPv4Network]):
+    This class organizes subnets into a hierarchy and provides
+    functionality to assign hosts to the most specific matching subnet.
+    """
+
+    def __init__(self, networks: list[IPv4Network]):
         """Initialize the registry with a list of subnets.
 
         Args:
@@ -73,17 +99,17 @@ class SubnetRegistry:
         self.externally_connected = False
 
         self.root_subnet = IPv4Network("0.0.0.0/0")
+
+        networks = list(networks)
         networks.append(self.root_subnet)
-        self._subnets: Dict[IPv4Network, SubnetNode] = {
-            net: SubnetNode(network=net) for net in networks
+
+        self._subnets: dict[IPv4Network, Subnet] = {
+            net: Subnet(network=net) for net in networks
         }
         self._build_hierarchy()
 
-    def __repr__(self) -> str:
-        return self._subnets.__repr__()
-
-    def find_subnets_from_ip(self, ip: IPv4Address) -> List[SubnetNode]:
-        """Find all subnets containing a given IP address.
+    def get_subnets_for_ip(self, ip: IPv4Address) -> list[Subnet]:
+        """Get all subnets containing the given IP address.
 
         Args:
             ip (IPv4Address): IP address to search for.
@@ -94,43 +120,71 @@ class SubnetRegistry:
         return [subnet for subnet in self._subnets.values() if ip in subnet.network]
 
     def _build_hierarchy(self) -> None:
-        """Assign parent relationships between subnets using CIDR containment."""
+        """Build parent-child relationships between subnets.
+
+        Subnets are ordered by prefix length and assigned parents based
+        on CIDR containment.
+        """
 
         subnets = list(self._subnets.values())
 
+        logger.debug(
+            "Building subnet hierarchy",
+            extra={"subnet_count": len(subnets)},
+        )
+
         subnets.sort(key=lambda s: s.network.prefixlen)
 
-        candidates = []
+        potential_parents = []
 
         for subnet in subnets:
             subnet.parent = None
 
-            for parent in reversed(candidates):
+            for parent in reversed(potential_parents):
                 if subnet.network.subnet_of(parent.network):
                     subnet.parent = parent
                     parent.child_subnets.append(subnet)
+
+                    logger.debug(
+                        "Assigned parent subnet",
+                        extra={
+                            "child": str(subnet.network),
+                            "parent": str(parent.network),
+                        },
+                    )
                     break
 
-            candidates.append(subnet)
+            potential_parents.append(subnet)
 
-    def attach_host(self, host: Host) -> None:
-        """Attach a host to the most specific subnet that contains any of its IPs.
+    def assign_host_to_subnet(self, host: Host) -> None:
+        """Assign a host to the most specific subnet that contains any of its IPs.
 
-        If a host is not part of a defined network, the whole registry is flagged
-        as externally connected.
+        If no matching subnet is found, the registry is marked as externally connected.
 
         Args:
             host (Host): Host to attach.
         """
+        logger.debug(
+            "Attaching host to subnet",
+            extra={"host_id": host.host_id, "ip_count": len(host.ip_addresses)},
+        )
         # Flatten and take best match
-        max_subnet = max(
-            (subnet for ip in host.ips for subnet in self.find_subnets_from_ip(ip)),
+        most_specific_subnet = max(
+            (
+                subnet
+                for ip in host.ip_addresses
+                for subnet in self.get_subnets_for_ip(ip)
+            ),
             key=lambda s: s.network.prefixlen,
             default=self._subnets[self.root_subnet],
         )
 
-        if max_subnet.network == self.root_subnet:
+        if most_specific_subnet.network == self.root_subnet:
+            logger.debug(
+                "Host not matched to any subnet, marking as external",
+                extra={"host_id": host.host_id},
+            )
             self.externally_connected = True
             return
 
-        max_subnet.add_host(host)
+        most_specific_subnet.add_host(host)
