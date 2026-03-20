@@ -33,7 +33,7 @@ class Host:
         """Add an IP address to the host.
 
         Args:
-            ip (IPv4Address): IP address to add.
+            ip: IP address to add.
         """
         self.ip_addresses.add(ip)
 
@@ -44,9 +44,9 @@ class Subnet:
 
     Attributes:
         network (IPv4Network): The IPv4 network represented by this node.
-        hosts (list[[Host]]): Hosts assigned to this subnet.
-        parent (Subnet): Parent subnet in the hierarchy.
-        child_subnets (list[[Subnet]]): Nested subnets within this subnet.
+        hosts (list[Host]): Hosts assigned to this subnet.
+        parent (Subnet | None): Parent subnet in the hierarchy.
+        child_subnets (list[Subnet]): Nested subnets within this subnet.
     """
 
     network: IPv4Network
