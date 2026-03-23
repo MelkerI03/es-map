@@ -211,17 +211,16 @@ def main(
     for host in hosts:
         registry.assign_host_to_subnet(host)
 
-    graph_data = export_graph(registry)
-    graph = build_nx_graph(graph_data)
-    layout = nx.spring_layout(graph, seed=42)
+    graph = export_graph(registry)
+    data = graph.model_dump_json(indent=2)
+    out_dir = Path("./out")
 
-    apply_layout(graph_data, layout)
+    with (out_dir / "graph.json").open(mode="w") as f:
+        f.write(data)
 
     # --- Render in browser ---
-    out_dir = Path("./out")
-    logger.info("Rendering network graph", extra={"output_dir": str(out_dir)})
-
-    render_web(graph_data, out_dir)
+    render_web(out_dir)
+    init_positioning(out_dir)
     serve_directory(out_dir)
 
     # --- Finish ---

@@ -43,10 +43,11 @@ def setup_logging(
 
     root_logger.handlers.clear()
 
-    formatter = logging.Formatter(
-        fmt=DEFAULT_FORMAT,
-        datefmt=DEFAULT_DATEFMT,
-    )
+    # formatter = logging.Formatter(
+    #     fmt=DEFAULT_FORMAT,
+    #     datefmt=DEFAULT_DATEFMT,
+    # )
+    formatter = JsonFormatter()
 
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
@@ -70,3 +71,48 @@ def get_logger(name: str) -> logging.Logger:
         A configured logger instance.
     """
     return logging.getLogger(name)
+
+
+class JsonFormatter(logging.Formatter):
+    """Format log records as structured JSON."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        log_record = {
+            "timestamp": datetime.date.fromtimestamp(record.created).strftime(
+                DEFAULT_DATEFMT
+            ),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+
+        # Include extra fields (anything not standard)
+        standard_fields = {
+            "name",
+            "msg",
+            "args",
+            "levelname",
+            "levelno",
+            "pathname",
+            "filename",
+            "module",
+            "exc_info",
+            "exc_text",
+            "stack_info",
+            "lineno",
+            "funcName",
+            "created",
+            "msecs",
+            "relativeCreated",
+            "thread",
+            "threadName",
+            "taskName",
+            "processName",
+            "process",
+        }
+
+        for key, value in record.__dict__.items():
+            if key not in standard_fields:
+                log_record[key] = value
+
+        return json.dumps(log_record, indent=2)

@@ -13,25 +13,55 @@ import threading
 import webbrowser
 from pathlib import Path
 
-from es_map.utils.file_handling import overwrite_copy
-from es_map.utils.paths import get_root_path
+import networkx as nx
+
+from es_map.utils.file_handling import copy_and_replace
 from es_map.utils.logging import get_logger
+from es_map.utils.paths import get_root_path
 
 logger = get_logger(__name__)
 
 
+def init_positioning(output_dir: Path, scale: int = 800) -> None:
+    """
+    Compute node positions using NetworkX spring layout.
+
+    Args:
+        output_dir (Path): Path where webserver will be hosted.
+
+    Returns:
+        Dict[str, Tuple[float, float]]: Mapping of node_id -> (x, y)
+    """
+    api_json = output_dir / "graph.json"
+    data = json.loads(api_json.read_text(encoding="utf-8"))
+
+    G = nx.Graph()
+
+    for node in data.get("nodes", []):
+        G.add_node(node["id"])
+
+    for edge in data.get("edges", []):
+        G.add_edge(edge["source"], edge["target"])
+
+    pos = nx.spring_layout(G, seed=42)
+
+    layout = {
+        node_id: (float(x * scale), float(y * scale)) for node_id, (x, y) in pos.items()
+    }
+
+    with open(output_dir / "layout.json", "w") as f:
+        json.dump(layout, f)
+
+
 def render_web(
-    network_data: dict[str, list[dict]],
     output_dir: Path,
 ) -> None:
     """Render the network graph as a static web visualization.
 
     This function:
-        1. Writes graph data to graph.json
-        2. Copies required static assets (JS, HTML) into the output directory
+        Copies required static assets (JS, HTML) into the output directory
 
     Args:
-        network_data: Graph data containing nodes, edges, and subnets.
         output_dir: Directory where web assets will be written.
 
     Raises:
@@ -41,27 +71,15 @@ def render_web(
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.debug("Ensured output directory exists", extra={"path": str(output_dir)})
 
-    (output_dir / "graph.json").write_text(
-        json.dumps(network_data, indent=2), encoding="utf-8"
-    )
-    logger.info(
-        "Wrote graph data",
-        extra={
-            "path": str(output_dir / "graph.json"),
-            "node_count": len(network_data.get("nodes", [])),
-            "edge_count": len(network_data.get("edges", [])),
-        },
-    )
-
     root_path = get_root_path()
     static_dir = root_path / "graph/static"
     templates_dir = root_path / "graph/templates"
 
     logger.debug("Copying static assets to output directory")
 
-    overwrite_copy(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
-    overwrite_copy(static_dir / "graph.js", output_dir / "graph.js")
-    overwrite_copy(templates_dir / "index.html", output_dir / "index.html")
+    copy_and_replace(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
+    copy_and_replace(static_dir / "graph.js", output_dir / "graph.js")
+    copy_and_replace(templates_dir / "index.html", output_dir / "index.html")
 
     logger.debug(
         "Static assets copied",
