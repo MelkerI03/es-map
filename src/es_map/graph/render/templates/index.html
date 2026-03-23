@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Network Graph</title>
   <script src="d3.v7.min.js"></script>
   <style>
-    body { margin: 0; font-family: sans-serif; }
-    svg { width: 100vw; height: 100vh; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    svg {
+      width: 100vw;
+      height: 100vh;
+    }
 
     .node {
       stroke: #333;
@@ -32,12 +40,58 @@
       stroke: #3399ff;
       stroke-width: 2px;
     }
+
+    /* Cog button */
+    #settings-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+
+      font-size: 24px;
+      background: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Sidebar base */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      /* hidden */
+      width: 300px;
+      height: 100%;
+
+      background: #f4f4f4;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+
+      padding: 20px;
+      transition: left 0.3s ease;
+
+      z-index: 999;
+    }
+
+    /* Visible state */
+    #sidebar.open {
+      left: 0;
+    }
   </style>
 </head>
-<body>
 
-<svg id="graph"></svg>
-<script src="graph.js"></script>
+<body>
+  <!-- Settings button -->
+  <button id="settings-btn">⚙️</button>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <h2>Settings</h2>
+    <p>Coming soon...</p>
+  </div>
+
+  <svg id="graph"></svg>
+  <script src="graph.js"></script>
 
 </body>
+
 </html>
