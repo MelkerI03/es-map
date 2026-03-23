@@ -3,9 +3,11 @@
 Lalalala
 """
 
+import networkx as nx
+
 import es_map.analysis.models as reg
 from es_map.analysis.models import SubnetRegistry
-from es_map.graph.models import Edge, Graph, Node, Subnet
+from es_map.graph.api.models import Edge, Graph, Node, Subnet
 from es_map.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -48,6 +50,8 @@ def export_graph(registry: SubnetRegistry) -> Graph:
         if not registry_subnet.network == registry.root_subnet:
             subnets.append(_build_subnet(registry_subnet))
 
+    layout = generate_layout(nodes, edges)
+
     logger.debug(
         "Graph export complete",
         extra={
@@ -57,7 +61,7 @@ def export_graph(registry: SubnetRegistry) -> Graph:
         },
     )
 
-    return Graph(nodes=nodes, edges=edges, subnets=subnets)
+    return Graph(nodes=nodes, edges=edges, subnets=subnets, layout=layout)
 
 
 def _build_router_node(reg_subnet: reg.Subnet) -> Node:
@@ -165,3 +169,33 @@ def _build_subnet(registry_subnet: reg.Subnet) -> Subnet:
 
     subnet = Subnet(id=subnet_id, label=subnet_label, members=subnet_member_ids)
     return subnet
+
+
+def generate_layout(
+    nodes: list[Node], edges: list[Edge], scale: float = 800
+) -> dict[str, tuple[float, float]]:
+    """
+    Compute node positions using NetworkX spring layout.
+
+    Args:
+        output_dir: Path where webserver will be hosted.
+        scale: Scale up/down node spread. 500-1000 is usually sensible.
+
+    Returns:
+        dict[str, tuple[float, float]]: Mapping of node_id -> (x, y)
+    """
+    G = nx.Graph()
+
+    for node in nodes:
+        G.add_node(node.id)
+
+    for edge in edges:
+        G.add_edge(edge.source, edge.target)
+
+    pos = nx.spring_layout(G, seed=42)
+
+    layout = {
+        node_id: (float(x * scale), float(y * scale)) for node_id, (x, y) in pos.items()
+    }
+
+    return layout

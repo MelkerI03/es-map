@@ -6,14 +6,11 @@ visualization.
 """
 
 import http.server
-import json
 import socketserver
 import sys
 import threading
 import webbrowser
 from pathlib import Path
-
-import networkx as nx
 
 from es_map.utils.file_handling import copy_and_replace
 from es_map.utils.logging import get_logger
@@ -22,38 +19,7 @@ from es_map.utils.paths import get_root_path
 logger = get_logger(__name__)
 
 
-def init_positioning(output_dir: Path, scale: int = 800) -> None:
-    """
-    Compute node positions using NetworkX spring layout.
-
-    Args:
-        output_dir (Path): Path where webserver will be hosted.
-
-    Returns:
-        Dict[str, Tuple[float, float]]: Mapping of node_id -> (x, y)
-    """
-    api_json = output_dir / "graph.json"
-    data = json.loads(api_json.read_text(encoding="utf-8"))
-
-    G = nx.Graph()
-
-    for node in data.get("nodes", []):
-        G.add_node(node["id"])
-
-    for edge in data.get("edges", []):
-        G.add_edge(edge["source"], edge["target"])
-
-    pos = nx.spring_layout(G, seed=42)
-
-    layout = {
-        node_id: (float(x * scale), float(y * scale)) for node_id, (x, y) in pos.items()
-    }
-
-    with open(output_dir / "layout.json", "w") as f:
-        json.dump(layout, f)
-
-
-def render_web(
+def prepare_web_render(
     output_dir: Path,
 ) -> None:
     """Render the network graph as a static web visualization.
@@ -72,8 +38,8 @@ def render_web(
     logger.debug("Ensured output directory exists", extra={"path": str(output_dir)})
 
     root_path = get_root_path()
-    static_dir = root_path / "graph/static"
-    templates_dir = root_path / "graph/templates"
+    static_dir = root_path / "graph/render/static"
+    templates_dir = root_path / "graph/render/templates"
 
     logger.debug("Copying static assets to output directory")
 
@@ -87,7 +53,7 @@ def render_web(
     )
 
 
-def serve_directory(directory: Path, port: int = 8000) -> None:
+def serve_directory(directory: Path, port: int = 8081) -> None:
     """Serve a directory over HTTP and open it in the default browser.
 
     Starts a local HTTP server in a background thread and blocks

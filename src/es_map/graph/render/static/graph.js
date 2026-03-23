@@ -23,9 +23,8 @@ const CONFIG = {
 };
 
 Promise.all([
-  d3.json("graph.json"),
-  d3.json("layout.json")
-]).then(([data, layout]) => {
+  d3.json("http://localhost:8000/graph"),
+]).then(([data]) => {
 
   if (!data.nodes || !data.edges) {
     console.error("Invalid graph data format", data);
@@ -33,8 +32,8 @@ Promise.all([
   }
 
   data.nodes.forEach(node => {
-    if (layout[node.id]) {
-      const [x, y] = layout[node.id];
+    if (data.layout[node.id]) {
+      const [x, y] = data.layout[node.id];
       node.x = x;
       node.y = y;
     }

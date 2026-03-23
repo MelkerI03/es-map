@@ -34,8 +34,9 @@ class Subnet(BaseModel):
 class Graph(BaseModel):
     """Todo: Write docstring"""
 
-    version: str = Field(default="1.0")
+    version: str = Field(default="1.1")
 
     nodes: list[Node]
     edges: list[Edge]
     subnets: list[Subnet]
+    layout: dict[str, tuple[float, float]]
