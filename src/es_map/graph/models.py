@@ -4,6 +4,7 @@ This is a module
 """
 
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
 

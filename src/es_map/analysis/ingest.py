@@ -1,8 +1,9 @@
 import ipaddress
 
 from elasticsearch import Elasticsearch
-from es_map.elastic.queries import fetch_hosts
+
 from es_map.analysis.models import Host
+from es_map.elastic.queries import fetch_hosts
 from es_map.utils.logging import get_logger
 
 logger = get_logger(__name__)

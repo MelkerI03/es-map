@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from ipaddress import IPv4Address, IPv4Network
-import hashlib
 
 from es_map.utils.logging import get_logger
 

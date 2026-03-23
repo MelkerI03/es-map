@@ -6,7 +6,6 @@ construction, and rendering of a network topology visualization.
 
 from pathlib import Path
 
-import networkx as nx
 import typer
 from dotenv import load_dotenv
 
@@ -19,11 +18,11 @@ from es_map.config import (
     validate_config,
 )
 from es_map.elastic.client import create_client
-from es_map.graph.builder import apply_layout, build_nx_graph
-from es_map.graph.export_graph import export_graph
-from es_map.graph.web_renderer import render_web, serve_directory
-from es_map.utils.logging import get_logger, setup_logging
 
+# from es_map.graph.export_graph import export_graph
+from es_map.graph.export import export_graph
+from es_map.graph.web_renderer import init_positioning, render_web, serve_directory
+from es_map.utils.logging import get_logger, setup_logging
 
 env_path = Path.cwd() / ".env"
 _ = load_dotenv(env_path) or load_dotenv()

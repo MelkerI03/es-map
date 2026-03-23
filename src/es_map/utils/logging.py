@@ -4,10 +4,11 @@ This module provides a centralized logging configuration to ensure
 consistent formatting and handler setup across the application.
 """
 
+import datetime
+import json
 import logging
 import sys
 from pathlib import Path
-
 
 DEFAULT_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
 DEFAULT_DATEFMT = "%Y-%m-%d %H:%M:%S"
