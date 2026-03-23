@@ -100,9 +100,23 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         pkgs.writeShellApplication {
-          name = "black-fmt";
-          runtimeInputs = [ pkgs.black ];
+          name = "fmt";
+          runtimeInputs = with pkgs; [
+            black
+            python3Packages.isort
+            python3Packages.autoflake
+          ];
           text = ''
+            echo "Running autoflake..."
+            autoflake --remove-all-unused-imports \
+                      --remove-unused-variables \
+                      --recursive \
+                      --in-place .
+
+            echo "Running isort..."
+            isort .
+
+            echo "Running black..."
             black .
           '';
         }

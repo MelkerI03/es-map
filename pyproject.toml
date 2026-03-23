@@ -20,3 +20,8 @@ es-map = "es_map.cli:app"
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
 build-backend = "uv_build"
+
+[tool.isort]
+profile = "black"
+filter_files = true
+skip = ["result", ".direnv", "venv", "build", "dist"]
