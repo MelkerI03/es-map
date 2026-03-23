@@ -1,0 +1,24 @@
+.node {
+  stroke: #333;
+  stroke-width: 1px;
+}
+
+.host {
+  fill: #66b2ff;
+}
+
+.router {
+  fill: #ffcc66;
+}
+
+.edge {
+  stroke: #555;
+  stroke-width: 1.5px;
+}
+
+.subnet {
+  fill: lightblue;
+  opacity: 0.2;
+  stroke: #3399ff;
+  stroke-width: 2px;
+}
