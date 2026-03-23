@@ -13,7 +13,6 @@
 const svg = d3.select("#graph");
 const width = window.innerWidth;
 const height = window.innerHeight;
-const container = svg.append("g");
 
 const CONFIG = {
   linkDistance: 200,
@@ -22,14 +21,6 @@ const CONFIG = {
   subnetPadding: 80,
   labelOffsetY: 50,
 };
-
-const zoom = d3.zoom()
-  .scaleExtent([0.1, 5])
-  .on("zoom", (event) => {
-    container.attr("transform", event.transform);
-  });
-
-svg.call(zoom);
 
 Promise.all([
   d3.json("http://localhost:8000/graph"),
@@ -63,7 +54,7 @@ Promise.all([
     .force("center", d3.forceCenter(width / 2, height / 2))
 
   // Draw edges
-  const edges = container.selectAll(".edge")
+  const edges = svg.selectAll(".edge")
     .data(data.edges)
     .enter()
     .append("line")
@@ -92,7 +83,7 @@ Promise.all([
     });
   }
 
-  const subnetPaths = container.selectAll(".subnet")
+  const subnetPaths = svg.selectAll(".subnet")
     .data(data.subnets)
     .enter()
     .append("path")
@@ -103,7 +94,7 @@ Promise.all([
     .attr("fill-opacity", 0.2);
 
   // Draw nodes
-  const nodes = container.selectAll(".node")
+  const nodes = svg.selectAll(".node")
     .data(data.nodes)
     .enter()
     .append("circle")
@@ -116,7 +107,7 @@ Promise.all([
     );
 
   // Draw labels
-  const labels = container.selectAll(".label")
+  const labels = svg.selectAll(".label")
     .data(data.nodes)
     .enter()
     .append("text")
