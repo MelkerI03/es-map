@@ -55,6 +55,8 @@ def copy_and_replace(src: Path, dst: Path) -> None:
                 # Recursively copy directory
                 copy_and_replace(item, target)
             else:
+                if target.exists():
+                    target.unlink()
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(item, target)
 

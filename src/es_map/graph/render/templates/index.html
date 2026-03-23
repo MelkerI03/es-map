@@ -41,25 +41,11 @@
       stroke-width: 2px;
     }
 
-    /* Cog button */
-    #settings-btn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1000;
-
-      font-size: 24px;
-      background: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    /* Sidebar base */
+    /* Sidebar */
     #sidebar {
       position: fixed;
       top: 0;
       left: -300px;
-      /* hidden */
       width: 300px;
       height: 100%;
 
@@ -72,21 +58,36 @@
       z-index: 999;
     }
 
-    /* Visible state */
+    /* Open state */
     #sidebar.open {
       left: 0;
+    }
+
+    /* Button (the handle) */
+    #settings-btn {
+      position: absolute;
+      top: 20px;
+      right: -40px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: #f4f4f4;
+      cursor: pointer;
+      /*border-radius: 0 5px 5px 0;*/
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
 
 <body>
   <!-- Settings button -->
-  <button id="settings-btn">
-    <object data="./icons/cog.svg" width="30" height="30" type="image/svg+xml"></object>
-  </button>
 
   <!-- Sidebar -->
   <div id="sidebar">
+    <button id="settings-btn">
+      <img src="./icons/cog.svg" width="25" height="25" />
+    </button>
+
     <h2>Settings</h2>
     <p>Coming soon...</p>
   </div>
