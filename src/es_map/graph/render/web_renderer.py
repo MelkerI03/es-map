@@ -19,6 +19,22 @@ from es_map.utils.paths import get_root_path
 logger = get_logger(__name__)
 
 
+def start_web() -> None:
+    """Prepare and serve the web-based graph visualization.
+
+    This function:
+    - Generates the required static assets for rendering
+    - Starts a local HTTP server to host the visualization
+
+    The served application can then fetch graph data from the API
+    and render it in the browser.
+    """
+    out_dir = Path("./out")
+
+    prepare_web_render(out_dir)
+    serve_directory(out_dir)
+
+
 def prepare_web_render(
     output_dir: Path,
 ) -> None:

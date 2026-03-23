@@ -1,3 +1,25 @@
+"""Domain models for network topology representation.
+
+This module defines the core data structures used to model
+network entities and their relationships, including:
+
+- Host: Represents an individual machine with associated IP addresses
+- Subnet: Represents a hierarchical IPv4 network segment
+- SubnetRegistry: Manages subnet hierarchy construction and host assignment
+
+These models form the domain layer of the application and are responsible for:
+- Maintaining consistent relationships between hosts and subnets
+- Encapsulating subnet hierarchy logic (CIDR containment)
+- Providing stable identifiers for graph construction
+
+This module is intentionally independent of:
+- External data sources (e.g., Elasticsearch)
+- API schemas (e.g., Pydantic models)
+- Rendering or visualization concerns
+
+It serves as the single source of truth for network topology logic.
+"""
+
 from __future__ import annotations
 
 import hashlib

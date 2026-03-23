@@ -42,8 +42,7 @@ class Edge(BaseModel):
 
 
 class Subnet(BaseModel):
-    """
-    Represents a subnet grouping within the graph.
+    """Represents a subnet grouping within the graph.
 
     A subnet contains:
     - a router node
@@ -61,8 +60,7 @@ class Subnet(BaseModel):
 
 
 class Graph(BaseModel):
-    """
-    Top-level graph structure used for API responses and rendering.
+    """Top-level graph structure used for API responses and rendering.
 
     This object contains all nodes, edges, subnet groupings, and layout
     information required to render the network visualization.
