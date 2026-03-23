@@ -4,8 +4,8 @@ This module defines the ElasticConfig data structure and provides
 utilities for parsing and validating user-provided configuration inputs.
 """
 
-from dataclasses import dataclass
 import ipaddress
+from dataclasses import dataclass
 from pathlib import Path
 
 from es_map.utils.logging import get_logger

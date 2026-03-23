@@ -5,12 +5,13 @@ description = "Static analysis network graphing tool"
 requires-python = ">=3.12"
 dependencies = [
   "elasticsearch>=7.0.0,<9",
-  "fastjsonschema>=2.21.2",
-  "hypernetx>=2.4.0",
+  "fastapi>=0.135.1",
   "networkx>=3.6.1",
-  "pandas<3",
+  "numpy>=2.4.3",
+  "pydantic>=2.12.5",
   "python-dotenv>=1.2.2",
   "typer>=0.24.1",
+  "uvicorn>=0.42.0",
 ]
 
 [project.scripts]
@@ -19,3 +20,8 @@ es-map = "es_map.cli:app"
 [build-system]
 requires = ["uv_build>=0.10.0,<0.11.0"]
 build-backend = "uv_build"
+
+[tool.isort]
+profile = "black"
+filter_files = true
+skip = ["result", ".direnv", "venv", "build", "dist"]

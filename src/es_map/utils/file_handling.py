@@ -11,7 +11,7 @@ from es_map.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
-def overwrite_copy(src: Path, dst: Path) -> None:
+def copy_and_replace(src: Path, dst: Path) -> None:
     """Copy a file to a destination, overwriting it if it already exists.
 
     If the destination file is locked or cannot be removed, the operation

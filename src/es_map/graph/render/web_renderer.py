@@ -6,32 +6,28 @@ visualization.
 """
 
 import http.server
-import json
 import socketserver
 import sys
 import threading
 import webbrowser
 from pathlib import Path
 
-from es_map.utils.file_handling import overwrite_copy
-from es_map.utils.paths import get_root_path
+from es_map.utils.file_handling import copy_and_replace
 from es_map.utils.logging import get_logger
+from es_map.utils.paths import get_root_path
 
 logger = get_logger(__name__)
 
 
-def render_web(
-    network_data: dict[str, list[dict]],
+def prepare_web_render(
     output_dir: Path,
 ) -> None:
     """Render the network graph as a static web visualization.
 
     This function:
-        1. Writes graph data to graph.json
-        2. Copies required static assets (JS, HTML) into the output directory
+        Copies required static assets (JS, HTML) into the output directory
 
     Args:
-        network_data: Graph data containing nodes, edges, and subnets.
         output_dir: Directory where web assets will be written.
 
     Raises:
@@ -41,27 +37,15 @@ def render_web(
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.debug("Ensured output directory exists", extra={"path": str(output_dir)})
 
-    (output_dir / "graph.json").write_text(
-        json.dumps(network_data, indent=2), encoding="utf-8"
-    )
-    logger.info(
-        "Wrote graph data",
-        extra={
-            "path": str(output_dir / "graph.json"),
-            "node_count": len(network_data.get("nodes", [])),
-            "edge_count": len(network_data.get("edges", [])),
-        },
-    )
-
     root_path = get_root_path()
-    static_dir = root_path / "graph/static"
-    templates_dir = root_path / "graph/templates"
+    static_dir = root_path / "graph/render/static"
+    templates_dir = root_path / "graph/render/templates"
 
     logger.debug("Copying static assets to output directory")
 
-    overwrite_copy(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
-    overwrite_copy(static_dir / "graph.js", output_dir / "graph.js")
-    overwrite_copy(templates_dir / "index.html", output_dir / "index.html")
+    copy_and_replace(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
+    copy_and_replace(static_dir / "graph.js", output_dir / "graph.js")
+    copy_and_replace(templates_dir / "index.html", output_dir / "index.html")
 
     logger.debug(
         "Static assets copied",
@@ -69,7 +53,7 @@ def render_web(
     )
 
 
-def serve_directory(directory: Path, port: int = 8000) -> None:
+def serve_directory(directory: Path, port: int = 8081) -> None:
     """Serve a directory over HTTP and open it in the default browser.
 
     Starts a local HTTP server in a background thread and blocks

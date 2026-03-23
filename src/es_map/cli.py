@@ -6,12 +6,13 @@ construction, and rendering of a network topology visualization.
 
 from pathlib import Path
 
-import networkx as nx
 import typer
 from dotenv import load_dotenv
 
 from es_map.analysis.ingest import build_hosts
 from es_map.analysis.models import SubnetRegistry
+from es_map.api.app import create_app
+from es_map.api.server import run_api
 from es_map.config import (
     ConfigError,
     ElasticConfig,
@@ -19,17 +20,18 @@ from es_map.config import (
     validate_config,
 )
 from es_map.elastic.client import create_client
-from es_map.graph.builder import apply_layout, build_nx_graph
-from es_map.graph.export_graph import export_graph
-from es_map.graph.web_renderer import render_web, serve_directory
+from es_map.graph.api.export import export_graph
+from es_map.graph.render.web_renderer import (
+    prepare_web_render,
+    serve_directory,
+)
 from es_map.utils.logging import get_logger, setup_logging
-
 
 env_path = Path.cwd() / ".env"
 _ = load_dotenv(env_path) or load_dotenv()
+logger = get_logger(__name__)
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
-logger = get_logger(__name__)
 
 
 @app.command()
@@ -202,27 +204,24 @@ def main(
 
     client = create_client(elastic_config)
 
+    registry = SubnetRegistry(parsed_subnets)
+
     # --- Collect network data ---
     hosts = build_hosts(client, elastic_config.index)
     logger.info("Fetched hosts from Elasticsearch", extra={"count": len(hosts)})
 
-    registry = SubnetRegistry(parsed_subnets)
-    logger.info("Assigned hosts to subnet registry")
-
     for host in hosts:
         registry.assign_host_to_subnet(host)
+    logger.info("Assigned hosts to subnet registry")
 
-    graph_data = export_graph(registry)
-    graph = build_nx_graph(graph_data)
-    layout = nx.spring_layout(graph, seed=42)
-
-    apply_layout(graph_data, layout)
+    # --- Create API endpoint ---
+    graph = export_graph(registry)
+    fastapi_app = create_app(graph=graph)
+    run_api(fastapi_app)
 
     # --- Render in browser ---
     out_dir = Path("./out")
-    logger.info("Rendering network graph", extra={"output_dir": str(out_dir)})
-
-    render_web(graph_data, out_dir)
+    prepare_web_render(out_dir)
     serve_directory(out_dir)
 
     # --- Finish ---

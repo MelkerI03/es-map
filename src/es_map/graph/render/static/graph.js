@@ -22,12 +22,22 @@ const CONFIG = {
   labelOffsetY: 50,
 };
 
-d3.json("graph.json").then(data => {
+Promise.all([
+  d3.json("http://localhost:8000/graph"),
+]).then(([data]) => {
 
   if (!data.nodes || !data.edges) {
     console.error("Invalid graph data format", data);
     return;
   }
+
+  data.nodes.forEach(node => {
+    if (data.layout[node.id]) {
+      const [x, y] = data.layout[node.id];
+      node.x = x;
+      node.y = y;
+    }
+  });
 
   console.debug("Graph data loaded", {
     nodes: data.nodes.length,
