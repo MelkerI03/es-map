@@ -1,6 +1,12 @@
-"""This is a module docstring
+"""Graph export utilities for converting internal subnet registry data
+into a structured graph representation.
 
-Lalalala
+This module transforms the domain-level `SubnetRegistry` into a
+Pydantic-based graph model consisting of nodes, edges, subnets,
+and layout information suitable for visualization and frontend use.
+
+The exported graph is intended to be consumed by rendering layers
+(e.g. D3.js) or exposed via an API.
 """
 
 import networkx as nx
@@ -14,8 +20,23 @@ logger = get_logger(__name__)
 
 
 def export_graph(registry: SubnetRegistry) -> Graph:
-    """Wow, What a function
-    This does this and that, along with other stuff
+    """Convert a subnet registry into a graph model.
+
+    This function traverses the entire subnet hierarchy and builds:
+    - Router nodes
+    - Host nodes
+    - Parent-child subnet edges
+    - Host-to-router edges
+    - Subnet groupings
+    - A computed layout for visualization
+
+    Args:
+        registry: The subnet registry containing all discovered
+            subnets and their associated hosts.
+
+    Returns:
+        Graph: A fully constructed graph object containing nodes,
+            edges, subnets, and layout data.
     """
     subnets: list[Subnet] = []
     nodes: list[Node] = []
@@ -65,11 +86,14 @@ def export_graph(registry: SubnetRegistry) -> Graph:
 
 
 def _build_router_node(reg_subnet: reg.Subnet) -> Node:
-    """This is my favorite function, thank goodness for this
+    """Create a router node for a subnet.
 
-    But, sometimes it yells at me
+    Args:
+        reg_subnet: The subnet from which the router is derived.
+
+    Returns:
+        Node: A node representing the subnet's router.
     """
-
     logger.debug(
         "Creating router node",
         extra={"router_id": reg_subnet.router_id},
@@ -83,9 +107,13 @@ def _build_router_node(reg_subnet: reg.Subnet) -> Node:
 
 
 def _build_parent_edge(reg_subnet: reg.Subnet) -> Edge:
-    """Building is like Bob,
+    """Create an edge between a subnet and its parent subnet.
 
-    We can do IT.
+    Args:
+        reg_subnet: The subnet containing a reference to its parent.
+
+    Returns:
+        Edge: An edge connecting the parent router to this subnet's router.
     """
     assert reg_subnet.parent
 
@@ -105,9 +133,14 @@ def _build_parent_edge(reg_subnet: reg.Subnet) -> Edge:
 
 
 def _build_host_node(reg_host: reg.Host) -> Node:
-    """Wouldn't it be great to be a monk?
+    """Create a node representing a host.
 
-    Just chill around in a church all day, looking out of the church tower.
+    Args:
+        reg_host: The host object from the registry.
+
+    Returns:
+        Node: A node representing the host, using hostname as label
+            if available, otherwise falling back to host ID.
     """
 
     logger.debug(
@@ -125,9 +158,14 @@ def _build_host_node(reg_host: reg.Host) -> Node:
 
 
 def _build_host_edges(hosts: list[Node], router: Node) -> list[Edge]:
-    """Party rockers in the house tonight.
+    """Create edges connecting hosts to their subnet router.
 
-    Everybody just have a good time.
+    Args:
+        hosts: List of host nodes belonging to a subnet.
+        router: The router node for the subnet.
+
+    Returns:
+        list[Edge]: Edges connecting each host to the router.
     """
 
     logger.debug(
@@ -141,9 +179,18 @@ def _build_host_edges(hosts: list[Node], router: Node) -> list[Edge]:
 
 
 def _build_subnet(registry_subnet: reg.Subnet) -> Subnet:
-    """Drink up baby, stay up all night, with the you could do.
+    """Create a subnet representation including all member nodes.
 
-    You wont but you might.
+    This includes recursive collection of:
+    - Hosts
+    - Router
+    - All nested child subnet members
+
+    Args:
+        registry_subnet: The subnet to convert.
+
+    Returns:
+        Subnet: A structured subnet object with member IDs and metadata.
     """
 
     def get_member_ids_recursive(registry_subnet: reg.Subnet) -> list[str]:
@@ -174,15 +221,20 @@ def _build_subnet(registry_subnet: reg.Subnet) -> Subnet:
 def generate_layout(
     nodes: list[Node], edges: list[Edge], scale: float = 800
 ) -> dict[str, tuple[float, float]]:
-    """
-    Compute node positions using NetworkX spring layout.
+    """Compute a 2D layout for graph nodes using a force-directed algorithm.
+
+    The layout is computed using NetworkX's spring layout algorithm
+    with a fixed random seed for deterministic output.
 
     Args:
-        output_dir: Path where webserver will be hosted.
-        scale: Scale up/down node spread. 500-1000 is usually sensible.
+        nodes: List of graph nodes.
+        edges: List of graph edges.
+        scale: Scaling factor for layout coordinates. Larger values
+            spread nodes further apart.
 
     Returns:
-        dict[str, tuple[float, float]]: Mapping of node_id -> (x, y)
+        dict[str, tuple[float, float]]: Mapping of node IDs to (x, y)
+            positions suitable for rendering.
     """
     G = nx.Graph()
 
