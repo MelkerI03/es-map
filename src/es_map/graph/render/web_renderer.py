@@ -12,7 +12,7 @@ import threading
 import webbrowser
 from pathlib import Path
 
-from es_map.utils.file_handling import copy_and_replace
+from es_map.utils.file_handling import copy_and_replace, prepare_output_dir
 from es_map.utils.logging import get_logger
 from es_map.utils.paths import get_root_path
 
@@ -59,9 +59,15 @@ def prepare_web_render(
 
     logger.debug("Copying static assets to output directory")
 
-    copy_and_replace(static_dir / "d3.v7.min.js", output_dir / "d3.v7.min.js")
-    copy_and_replace(static_dir / "graph.js", output_dir / "graph.js")
+    prepare_output_dir(output_dir)
+    copy_and_replace(static_dir, output_dir)
+    print(f"copying from {static_dir} to {output_dir}")
     copy_and_replace(templates_dir / "index.html", output_dir / "index.html")
+
+    icons_dir = output_dir / "icons"
+    icons_dir.mkdir(exist_ok=True)
+    images = get_root_path() / "icons"
+    copy_and_replace(images / "cog.svg", icons_dir / "cog.svg")
 
     logger.debug(
         "Static assets copied",
