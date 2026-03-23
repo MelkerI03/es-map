@@ -1,12 +1,41 @@
+"""Graph construction utilities from Elasticsearch data.
+
+This module is responsible for:
+- Fetching and transforming raw Elasticsearch data into domain models
+- Building a subnet registry from configured networks
+- Assigning hosts to subnets
+- Exporting the resulting structure into a graph API model
+
+It acts as the bridge between:
+- the Elasticsearch data source
+- the domain layer (Host, SubnetRegistry)
+- the graph export layer used by the API and frontend
+"""
+
 import ipaddress
 
 from elasticsearch import Elasticsearch
 
-from es_map.analysis.models import Host
+from es_map.analysis.models import Host, SubnetRegistry
+from es_map.config import ElasticConfig
 from es_map.elastic.queries import fetch_hosts
+from es_map.graph.api.export import export_graph
 from es_map.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+def build_graph(client: Elasticsearch, config: ElasticConfig):
+    registry = SubnetRegistry(config.subnets)
+
+    hosts = build_hosts(client, config.index)
+    logger.info("Fetched hosts from Elasticsearch", extra={"count": len(hosts)})
+
+    for host in hosts:
+        registry.assign_host_to_subnet(host)
+    logger.info("Assigned hosts to subnet registry")
+
+    return export_graph(registry)
 
 
 def build_hosts(client: Elasticsearch, index_name: str | None) -> list[Host]:

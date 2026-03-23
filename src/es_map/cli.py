@@ -9,22 +9,11 @@ from pathlib import Path
 import typer
 from dotenv import load_dotenv
 
-from es_map.analysis.ingest import build_hosts
-from es_map.analysis.models import SubnetRegistry
-from es_map.api.app import create_app
-from es_map.api.server import run_api
-from es_map.config import (
-    ConfigError,
-    ElasticConfig,
-    parse_subnets,
-    validate_config,
-)
+from es_map.analysis.ingest import build_graph
+from es_map.api.app import start_api
+from es_map.config import build_config
 from es_map.elastic.client import create_client
-from es_map.graph.api.export import export_graph
-from es_map.graph.render.web_renderer import (
-    prepare_web_render,
-    serve_directory,
-)
+from es_map.graph.render.web_renderer import start_web
 from es_map.utils.logging import get_logger, setup_logging
 
 env_path = Path.cwd() / ".env"
@@ -170,62 +159,31 @@ def main(
         },
     )
 
-    try:
-        parsed_subnets = parse_subnets(subnet_cidrs)
-        logger.info("Parsed subnets", extra={"count": len(parsed_subnets)})
-    except (ValueError, AssertionError) as e:
-        logger.error("Invalid subnet input: %s", e)
-        typer.secho(
-            f"Fatal error: {e}. Run with --log-level DEBUG for details.",
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(code=1)
-
-    elastic_config = ElasticConfig(
+    elastic_config = build_config(
         host=elastic_host,
         port=elastic_port,
-        subnets=parsed_subnets,
+        subnet_cidrs=subnet_cidrs,
         index=index,
         username=username,
         password=password,
         api_key=api_key,
-        use_ssl=ssl_enabled,
+        ssl_enabled=ssl_enabled,
         ca_cert=ca_cert,
         client_cert=client_cert,
         client_key=client_key,
-        verify=verify_ssl,
+        verify_ssl=verify_ssl,
     )
-
-    try:
-        validate_config(elastic_config)
-    except ConfigError as e:
-        logger.warning("Configuration validation failed", extra={"error": str(e)})
-        typer.secho(f"Configuration error: {e}", fg=typer.colors.RED)
 
     client = create_client(elastic_config)
 
-    registry = SubnetRegistry(parsed_subnets)
+    graph = build_graph(client, elastic_config)
 
-    # --- Collect network data ---
-    hosts = build_hosts(client, elastic_config.index)
-    logger.info("Fetched hosts from Elasticsearch", extra={"count": len(hosts)})
+    start_api(graph)
 
-    for host in hosts:
-        registry.assign_host_to_subnet(host)
-    logger.info("Assigned hosts to subnet registry")
+    start_web()
 
-    # --- Create API endpoint ---
-    graph = export_graph(registry)
-    fastapi_app = create_app(graph=graph)
-    run_api(fastapi_app)
-
-    # --- Render in browser ---
-    out_dir = Path("./out")
-    prepare_web_render(out_dir)
-    serve_directory(out_dir)
-
-    # --- Finish ---
     logger.info("Finished successfully")
+    typer.Exit()
 
 
 if __name__ == "__main__":

@@ -50,6 +50,46 @@ class ConfigError(Exception):
     pass
 
 
+def build_config(
+    host,
+    port,
+    subnet_cidrs,
+    index,
+    username,
+    password,
+    api_key,
+    ssl_enabled,
+    ca_cert,
+    client_cert,
+    client_key,
+    verify_ssl,
+) -> ElasticConfig:
+
+    parsed_subnets = parse_subnets(subnet_cidrs)
+    logger.info("Parsed subnets", extra={"count": len(parsed_subnets)})
+    elastic_config = ElasticConfig(
+        host=host,
+        port=port,
+        subnets=parsed_subnets,
+        index=index,
+        username=username,
+        password=password,
+        api_key=api_key,
+        use_ssl=ssl_enabled,
+        ca_cert=ca_cert,
+        client_cert=client_cert,
+        client_key=client_key,
+        verify=verify_ssl,
+    )
+
+    try:
+        validate_config(elastic_config)
+    except ConfigError as e:
+        logger.warning("Configuration validation failed", extra={"error": str(e)})
+
+    return elastic_config
+
+
 def parse_subnets(raw_subnets: list[str]) -> list[ipaddress.IPv4Network]:
     """Parse and validate a list of subnet strings.
 

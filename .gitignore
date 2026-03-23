@@ -7,3 +7,4 @@ out/*
 build/*
 dist/*
 es_map.egg*
+**/__pycache__/
