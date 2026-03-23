@@ -12,6 +12,7 @@ from multiprocessing import Process
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from es_map.graph.api.models import Graph
 
@@ -26,6 +27,8 @@ def start_api(graph):
         graph: Graph data to be served by the API.
     """
     app = create_app(graph)
+
+    app.mount("/", StaticFiles(directory="./out", html=True), name="static")
     run_api(app)
 
 

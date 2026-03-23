@@ -25,3 +25,6 @@ build-backend = "uv_build"
 profile = "black"
 filter_files = true
 skip = ["result", ".direnv", "venv", "build", "dist"]
+
+[tool.setuptools.package-data]
+my_app = ["icons/*"]
