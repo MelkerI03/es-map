@@ -163,12 +163,19 @@ def _build_host_node(registry: SubnetRegistry, reg_host: reg.Host) -> Node:
         subnet_cidrs = [str(subnet.network) for subnet in subnets]
         host_subnets.extend(subnet_cidrs)
 
+    host_connections = reg_host.connections
+    host_first_seen = reg_host.first_seen
+    host_last_seen = reg_host.last_seen
+
     host = Node(
         id=host_id,
         label=host_label,
         ip_addresses=host_ips,
         subnets=host_subnets,
         type="host",
+        connections=host_connections,
+        first_seen=host_first_seen,
+        last_seen=host_last_seen,
     )
     return host
 

@@ -26,6 +26,9 @@ def fetch_hosts(client: Elasticsearch, query_index: str | None) -> list[dict]:
             - host_id: Unique identifier of the host.
             - hostname: Optional hostname.
             - ips: List of IP address strings.
+            - first_seen: First time host has been mentioned.
+            - last_seen: Last time host has been mentioned.
+            - connections: List of hosts that this host has communicated with directly.
 
     Raises:
         KeyError: If the expected aggregation structure is missing.
@@ -48,6 +51,14 @@ def fetch_hosts(client: Elasticsearch, query_index: str | None) -> list[dict]:
                 "aggs": {
                     "hostnames": {"terms": {"field": "host.name", "size": 1}},
                     "ips": {"terms": {"field": "host.ip", "size": 100}},
+                    "first_seen": {"min": {"field": "@timestamp"}},
+                    "last_seen": {"max": {"field": "@timestamp"}},
+                    "connections": {
+                        "terms": {
+                            "field": "destination.ip",
+                            "size": 1000,
+                        }
+                    },
                 },
             }
         },
@@ -76,11 +87,20 @@ def fetch_hosts(client: Elasticsearch, query_index: str | None) -> list[dict]:
         ip_buckets = bucket.get("ips", {}).get("buckets", [])
         ips = [ip["key"] for ip in ip_buckets]
 
+        first_seen = bucket.get("first_seen", {}).get("value", "")
+        last_seen = bucket.get("last_seen", {}).get("value", "")
+
+        connection_buckets = bucket.get("connections", {}).get("buckets", [])
+        connections = [conn["key"] for conn in connection_buckets]
+
         results.append(
             {
                 "host_id": host_id,
                 "hostname": hostname,
                 "ips": ips,
+                "first_seen": first_seen,
+                "last_seen": last_seen,
+                "connections": connections,
             }
         )
 

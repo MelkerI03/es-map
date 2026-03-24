@@ -10,11 +10,8 @@
 ## Host information
 Click on host -> Highlight
 Click on host to view information:
-    * ip addresses,
     * hosts talked to,
-    * subnets(s)
-    * Online/offline (last seen),
-    * and so on.
+    * Online/Offline (last seen),
 
 ## Forces
 Pull clients out of the center, decreasing with the distance from the center.

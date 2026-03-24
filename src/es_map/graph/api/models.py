@@ -28,8 +28,24 @@ class Node(BaseModel):
         description="Type of node: either 'host' or 'router'"
     )
 
-    ip_addresses: list[str] = Field(default_factory=list)
-    subnets: list[str] = Field(default_factory=list)
+    ip_addresses: list[str] = Field(
+        default_factory=list, description="IP addresses linked to node"
+    )
+    subnets: list[str] = Field(
+        default_factory=list, description="Subnets that the node is part of"
+    )
+
+    connections: list[str] = Field(
+        default_factory=list,
+        description="List of hosts that this node has directly communicated with",
+    )
+
+    first_seen: str = Field(
+        default_factory=str, description="First observation of node in logs (epoch)"
+    )
+    last_seen: str = Field(
+        default_factory=str, description="Last observation of node in logs (epoch)"
+    )
 
 
 class Edge(BaseModel):
@@ -70,7 +86,7 @@ class Graph(BaseModel):
     """
 
     version: str = Field(
-        default="1.2",
+        default="1.3",
         description="Graph schema version for compatibility tracking",
     )
 

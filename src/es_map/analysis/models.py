@@ -40,12 +40,19 @@ class Host:
         hostname (str): Optional human-readable hostname.
         ip_addresses (set[IPv4Address]): Set of IPv4 addresses assigned to the host.
         child_subnets (list[Subnet]): Virtual subnets owned by this host.
+        connections (list[str]): List of host ids that this host has communicated with.
+        first_seen (str): First time this node has been observed in the network (epoch).
+        last_seen (str): Last time this node has been observed in the network (epoch).
     """
 
     host_id: str
     hostname: str | None = None
     ip_addresses: set[IPv4Address] = field(default_factory=set)
-    child_subnets: list["Subnet"] = field(default_factory=list)  # For virtual subnets
+    child_subnets: list[Subnet] = field(default_factory=list)  # For virtual subnets
+    connections: list[str] = field(default_factory=list)
+
+    first_seen: str = ""
+    last_seen: str = ""
 
     def __hash__(self) -> int:
         """Compute hash based on host_id."""

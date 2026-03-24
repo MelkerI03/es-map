@@ -63,10 +63,15 @@ def build_hosts(client: Elasticsearch, index_name: str | None) -> list[Host]:
 
     hosts: list[Host] = []
 
+    all_ips = set()
+
     for host_record in raw_host_records:
         host = Host(
             host_id=host_record["host_id"],
             hostname=host_record["hostname"],
+            connections=host_record["connections"],
+            first_seen=str(host_record["first_seen"]),
+            last_seen=str(host_record["last_seen"]),
         )
 
         for ip_str in host_record["ips"]:
@@ -88,8 +93,13 @@ def build_hosts(client: Elasticsearch, index_name: str | None) -> list[Host]:
                 continue
 
             host.add_ip(ip_addr)
+            all_ips.add(ip_str)
 
         hosts.append(host)
+
+    # Only add hosts connections that are in our network
+    for host in hosts:
+        host.connections = [conn for conn in host.connections if conn in all_ips]
 
     logger.debug(
         "Built hosts from Elasticsearch",
