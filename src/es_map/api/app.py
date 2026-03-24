@@ -8,9 +8,8 @@ The API exposes the graph data via HTTP endpoints and is intended
 to be consumed by frontend visualization clients.
 """
 
-from multiprocessing import Process
+import threading
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -60,7 +59,7 @@ def create_app(graph: Graph) -> FastAPI:
     return app
 
 
-def run_api(app, host="127.0.0.1", port=8000) -> Process:
+def run_api(app, host="127.0.0.1", port=8000) -> None:
     """Run a FastAPI application in a separate process using Uvicorn.
 
     This allows the API server to run concurrently with other parts
@@ -74,16 +73,12 @@ def run_api(app, host="127.0.0.1", port=8000) -> Process:
     Returns:
         Process: The spawned process running the API server.
     """
-    proc = Process(
+    import uvicorn
+
+    thread = threading.Thread(
         target=uvicorn.run,
         args=(app,),
-        kwargs={
-            "host": host,
-            "port": port,
-            "log_level": "info",
-        },
+        kwargs={"host": host, "port": port},
         daemon=True,
     )
-
-    proc.start()
-    return proc
+    thread.start()
