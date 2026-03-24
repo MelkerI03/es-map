@@ -33,4 +33,8 @@ export function updateHostSidebar(nodeData) {
   document.getElementById("host-id").textContent = nodeData.id;
   document.getElementById("host-ips").textContent = nodeData.ip_addresses;
   document.getElementById("host-subnets").textContent = nodeData.subnets;
+  document.getElementById("host-first-seen").textContent = nodeData.first_seen;
+  document.getElementById("host-last-seen").textContent = nodeData.last_seen;
+  document.getElementById("host-connections").textContent = nodeData.connections;
+
 }
