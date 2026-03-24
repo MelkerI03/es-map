@@ -29,9 +29,8 @@ export function initSidebar({ sidebarId, triggerId }) {
 }
 
 export function updateHostSidebar(nodeData) {
-  document.getElementById("host-title").textContent = nodeData.label;
+  document.getElementById("host-hostname").textContent = nodeData.label;
   document.getElementById("host-id").textContent = nodeData.id;
-
-  // future:
-  // document.getElementById("host-ip").textContent = nodeData.ip;
+  document.getElementById("host-ips").textContent = nodeData.ip_addresses;
+  document.getElementById("host-subnets").textContent = nodeData.subnets;
 }
