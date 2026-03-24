@@ -8,6 +8,7 @@ a = Analysis(
     binaries=collect_dynamic_libs('pydantic_core'),
     datas=[
         ('src/es_map/graph', 'graph'),
+        ('src/es_map/icons', 'icons'),
     ],
     hiddenimports=[
         'matplotlib.backends.backend_svg',
