@@ -61,7 +61,6 @@ def prepare_web_render(
 
     prepare_output_dir(output_dir)
     copy_and_replace(static_dir, output_dir)
-    print(f"copying from {static_dir} to {output_dir}")
     copy_and_replace(templates_dir / "index.html", output_dir / "index.html")
 
     icons_src = get_root_path() / "icons"
