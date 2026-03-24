@@ -11,7 +11,8 @@ const height = window.innerHeight;
 const container = svg.append("g");
 
 // Zoom
-const zoom = d3.zoom()
+const zoom = d3
+  .zoom()
   .scaleExtent([0.1, 5])
   .on("zoom", (event) => {
     container.attr("transform", event.transform);
@@ -21,10 +22,13 @@ svg.call(zoom);
 
 // UI
 initSidebar({ sidebarId: "settings-sidebar", triggerId: "settings-btn" });
-const hostSidebar = initSidebar({ sidebarId: "hostinfo-sidebar", triggerId: null });
+const hostSidebar = initSidebar({
+  sidebarId: "hostinfo-sidebar",
+  triggerId: null,
+});
 
 // Main
-loadGraph().then(data => {
+loadGraph().then((data) => {
   const simulation = createSimulation(data.nodes, data.edges, width, height);
   const drag = createDrag(simulation);
 

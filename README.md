@@ -7,6 +7,7 @@
 ---
 
 ## Table of Contents
+
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -16,6 +17,7 @@
 ---
 
 ## Features
+
 - Generate a static, hierarchical image of a network topology inferred from an Elasticsearch instance.
 - Currently supports visualization of subnet structures using CIDR notation.
 
@@ -26,18 +28,22 @@
 ## Installation
 
 ### Linux
-1. Install [Nix](https://nixos.org/download.html).  
+
+1. Install [Nix](https://nixos.org/download.html).
 2. Use one of the following commands:
    ```bash
    nix build     # Build the project
    nix run       # Run the project directly
    ```
-  ### Windows
+
+### Windows
 
 1.  Download the latest executable from the Releases page.
 
 ## Usage
+
 1. Ensure you can authenticate to your Elasticsearch instance using either flags or environment variables:
+
 ```
 ES_HOST			| --host
 ES_PORT			| --port
@@ -49,21 +55,23 @@ ES_CA_CERT		| --ca-cert
 ES_CLIENT_CERT	| --client-cert
 ES_CLIENT_KEY	| --client-key
 ```
+
 For more information, please read the [elasticsearch api documentation](https://www.elastic.co/docs/api/doc/elasticsearch/authentication).
 
 2. Run the tool:
+
 ```bash
 $ es-map [FLAGS] <SUBNETS>
 ```
+
 or further information on how the tool is run:
+
 ```bash
  $ es-map --help
 ```
 
-
 ## Contribution Guidelines
 
 Because this is a bachelors thesis, contributions must be made via forking this repository.
-
 
 ## Acknowledgments

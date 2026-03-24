@@ -1,69 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Network Graph</title>
+    <script src="d3.v7.min.js"></script>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <title>Network Graph</title>
-  <script src="d3.v7.min.js"></script>
-  <link rel="stylesheet" href="styles/main.css">
-</head>
+  <body>
+    <!-- Sidebars -->
+    <div id="settings-sidebar">
+      <button id="settings-btn">
+        <img src="./icons/cog.svg" width="25" height="25" />
+      </button>
 
-<body>
-  <!-- Sidebars -->
-  <div id="settings-sidebar">
-    <button id="settings-btn">
-      <img src="./icons/cog.svg" width="25" height="25" />
-    </button>
+      <h2>Settings</h2>
+      <p>Coming soon...</p>
+    </div>
 
-    <h2>Settings</h2>
-    <p>Coming soon...</p>
-  </div>
+    <div id="hostinfo-sidebar">
+      <h2>Host</h2>
 
+      <div class="info-list">
+        <div class="info-row">
+          <span class="info-label">ID</span>
+          <span class="info-value" id="host-id"></span>
+        </div>
 
-  <div id="hostinfo-sidebar">
-    <h2>Host</h2>
+        <div class="info-row">
+          <span class="info-label">Hostname</span>
+          <span class="info-value" id="host-hostname"></span>
+        </div>
 
-    <div class="info-list">
-      <div class="info-row">
-        <span class="info-label">ID</span>
-        <span class="info-value" id="host-id"></span>
-      </div>
+        <div class="info-row">
+          <span class="info-label">IPs</span>
+          <span class="info-value" id="host-ips"></span>
+        </div>
 
-      <div class="info-row">
-        <span class="info-label">Hostname</span>
-        <span class="info-value" id="host-hostname"></span>
-      </div>
+        <div class="info-row">
+          <span class="info-label">Subnets</span>
+          <span class="info-value" id="host-subnets"></span>
+        </div>
 
-      <div class="info-row">
-        <span class="info-label">IPs</span>
-        <span class="info-value" id="host-ips"></span>
-      </div>
+        <div class="info-row">
+          <span class="info-label">First Seen</span>
+          <span class="info-value" id="host-first-seen"></span>
+        </div>
 
-      <div class="info-row">
-        <span class="info-label">Subnets</span>
-        <span class="info-value" id="host-subnets"></span>
-      </div>
+        <div class="info-row">
+          <span class="info-label">Last Seen</span>
+          <span class="info-value" id="host-last-seen"></span>
+        </div>
 
-      <div class="info-row">
-        <span class="info-label">First Seen</span>
-        <span class="info-value" id="host-first-seen"></span>
-      </div>
-
-      <div class="info-row">
-        <span class="info-label">Last Seen</span>
-        <span class="info-value" id="host-last-seen"></span>
-      </div>
-
-      <div class="info-row">
-        <span class="info-label">Connections</span>
-        <span class="info-value" id="host-connections"></span>
+        <div class="info-row">
+          <span class="info-label">Connections</span>
+          <span class="info-value" id="host-connections"></span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <svg id="graph"></svg>
-  <script type="module" src="graph.js"></script>
-
-</body>
-
+    <svg id="graph"></svg>
+    <script type="module" src="graph.js"></script>
+  </body>
 </html>

@@ -81,7 +81,7 @@ class Subnet:
     network: IPv4Network
     hosts: set[Host] = field(default_factory=set)
     parent: Subnet | None = field(default=None, repr=False, compare=False)
-    child_subnets: list["Subnet"] = field(default_factory=list, repr=False)
+    child_subnets: list[Subnet] = field(default_factory=list, repr=False)
 
     def add_host(self, host: Host) -> None:
         """Add a host to the subnet.
@@ -123,7 +123,7 @@ class SubnetRegistry:
         """Initialize the registry with a list of subnets.
 
         Args:
-            networks (List[IPv4Network]): List of IPv4Network objects to register.
+            networks: List of IPv4Network objects to register.
         """
         self.externally_connected = False
 
@@ -141,10 +141,10 @@ class SubnetRegistry:
         """Get all subnets containing the given IP address.
 
         Args:
-            ip (IPv4Address): IP address to search for.
+            ip: IP address to search for.
 
         Returns:
-            List[SubnetNode]: List of subnet nodes containing the IP.
+            list[Subnet]: List of subnet nodes containing the IP.
         """
         return [subnet for subnet in self._subnets.values() if ip in subnet.network]
 
@@ -191,7 +191,7 @@ class SubnetRegistry:
         If no matching subnet is found, the registry is marked as externally connected.
 
         Args:
-            host (Host): Host to attach.
+            host: Host to attach.
         """
         logger.debug(
             "Attaching host to subnet",

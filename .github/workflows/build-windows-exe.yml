@@ -50,7 +50,7 @@ jobs:
           }
 
           nuitka --show-progress --assume-yes-for-downloads --standalone --lto=yes --output-dir=build --output-filename=es-map $extraFlags es_map/cli.py
-      
+
       - name: Move executable
         shell: pwsh
         run: |
