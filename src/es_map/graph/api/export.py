@@ -61,7 +61,7 @@ def export_graph(registry: SubnetRegistry) -> Graph:
             edges.append(_build_parent_edge(registry_subnet))
 
         current_subnet_hosts: list[Node] = [
-            _build_host_node(h) for h in registry_subnet.hosts
+            _build_host_node(registry, h) for h in registry_subnet.hosts
         ]
 
         nodes.extend(current_subnet_hosts)
@@ -132,10 +132,12 @@ def _build_parent_edge(reg_subnet: reg.Subnet) -> Edge:
     return edge
 
 
-def _build_host_node(reg_host: reg.Host) -> Node:
+def _build_host_node(registry: SubnetRegistry, reg_host: reg.Host) -> Node:
     """Create a node representing a host.
 
     Args:
+        registry: The subnet registry containing all discovered
+            subnets and their associated hosts.
         reg_host: The host object from the registry.
 
     Returns:
@@ -153,7 +155,21 @@ def _build_host_node(reg_host: reg.Host) -> Node:
     host_id = reg_host.host_id
     host_label = reg_host.hostname if reg_host.hostname else host_id
 
-    host = Node(id=host_id, label=host_label, type="host")
+    host_ips = [str(ip) for ip in reg_host.ip_addresses]
+
+    host_subnets: list[str] = []
+    for ip in reg_host.ip_addresses:
+        subnets = registry.get_subnets_for_ip(ip)
+        subnet_cidrs = [str(subnet.network) for subnet in subnets]
+        host_subnets.extend(subnet_cidrs)
+
+    host = Node(
+        id=host_id,
+        label=host_label,
+        ip_addresses=host_ips,
+        subnets=host_subnets,
+        type="host",
+    )
     return host
 
 
@@ -220,7 +236,7 @@ def _build_subnet(registry_subnet: reg.Subnet) -> Subnet:
 
 def generate_layout(
     nodes: list[Node], edges: list[Edge], scale: float = 800
-) -> dict[str, tuple[float, float]]:
+) -> dict[str, list[float]]:
     """Compute a 2D layout for graph nodes using a force-directed algorithm.
 
     The layout is computed using NetworkX's spring layout algorithm
@@ -233,7 +249,7 @@ def generate_layout(
             spread nodes further apart.
 
     Returns:
-        dict[str, tuple[float, float]]: Mapping of node IDs to (x, y)
+        dict[str, list[float]: Mapping of node IDs to [x, y]
             positions suitable for rendering.
     """
     G = nx.Graph()
@@ -247,7 +263,7 @@ def generate_layout(
     pos = nx.spring_layout(G, seed=42)
 
     layout = {
-        node_id: (float(x * scale), float(y * scale)) for node_id, (x, y) in pos.items()
+        node_id: [float(x * scale), float(y * scale)] for node_id, (x, y) in pos.items()
     }
 
     return layout

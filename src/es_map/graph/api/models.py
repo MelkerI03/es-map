@@ -28,13 +28,16 @@ class Node(BaseModel):
         description="Type of node: either 'host' or 'router'"
     )
 
+    ip_addresses: list[str] = Field(default_factory=list)
+    subnets: list[str] = Field(default_factory=list)
+
 
 class Edge(BaseModel):
     """Represents a connection between two nodes in the graph.
 
     Edges define relationships such as:
-    - host → router connections
-    - subnet → parent subnet connections
+    - host -> router connections
+    - subnet -> parent subnet connections
     """
 
     source: str = Field(description="ID of the source node")
@@ -67,7 +70,7 @@ class Graph(BaseModel):
     """
 
     version: str = Field(
-        default="1.1",
+        default="1.2",
         description="Graph schema version for compatibility tracking",
     )
 
