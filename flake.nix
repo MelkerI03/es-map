@@ -105,6 +105,10 @@
             black
             python3Packages.isort
             python3Packages.autoflake
+
+            nodejs
+            nodePackages.prettier
+            nodePackages.eslint
           ];
           text = ''
             echo "Running autoflake..."
@@ -118,6 +122,12 @@
 
             echo "Running black..."
             black .
+
+            echo "Running prettier..."
+            prettier --write .
+
+            echo "Running eslint..."
+            eslint . --fix
           '';
         }
       );

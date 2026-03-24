@@ -16,7 +16,8 @@ export function createDrag(simulation) {
     d.fy = null;
   }
 
-  return d3.drag()
+  return d3
+    .drag()
     .on("start", dragstarted)
     .on("drag", dragged)
     .on("end", dragended);

@@ -5,7 +5,7 @@ export async function loadGraph() {
     throw new Error("Invalid graph data format");
   }
 
-  data.nodes.forEach(node => {
+  data.nodes.forEach((node) => {
     if (data.layout[node.id]) {
       const [x, y] = data.layout[node.id];
       node.x = x;
