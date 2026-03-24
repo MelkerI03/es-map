@@ -5,6 +5,13 @@
 
 .host {
   fill: #66b2ff;
+  cursor: pointer;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.host:hover {
+  stroke: #000;
+  stroke-width: 2px;
 }
 
 .router {
