@@ -1,14 +1,17 @@
+from PyInstaller.utils.hooks import collect_dynamic_libs
+
 block_cipher = None
 
 a = Analysis(
     ['src/es_map/cli.py'],
     pathex=[],
-    binaries=[],
+    binaries=collect_dynamic_libs('pydantic_core'),
     datas=[
         ('src/es_map/graph', 'graph'),
     ],
     hiddenimports=[
         'matplotlib.backends.backend_svg',
+        'pydantic_core._pydantic_core',
     ],
     hookspath=[],
     hooksconfig={},
