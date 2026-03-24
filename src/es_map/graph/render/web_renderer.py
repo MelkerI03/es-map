@@ -64,10 +64,11 @@ def prepare_web_render(
     print(f"copying from {static_dir} to {output_dir}")
     copy_and_replace(templates_dir / "index.html", output_dir / "index.html")
 
-    icons_dir = output_dir / "icons"
-    icons_dir.mkdir(exist_ok=True)
-    images = get_root_path() / "icons"
-    copy_and_replace(images / "cog.svg", icons_dir / "cog.svg")
+    icons_src = get_root_path() / "icons"
+    icons_dst = output_dir / "icons"
+    icons_dst.mkdir(exist_ok=True)
+
+    copy_and_replace(icons_src, icons_dst)
 
     logger.debug(
         "Static assets copied",
