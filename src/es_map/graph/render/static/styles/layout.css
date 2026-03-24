@@ -6,12 +6,12 @@ svg {
 #settings-sidebar {
   position: fixed;
   top: 0;
-  left: -300px;
+  left: -340px;
   width: 300px;
   height: 100%;
   background: #f4f4f4;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  padding: 0;
+  padding: 20px;
   transition: left 0.3s ease;
   z-index: 999;
 }
@@ -23,14 +23,14 @@ svg {
 #hostinfo-sidebar {
   position: fixed;
   top: 0;
-  right: -300px;
+  right: -340px;
   width: 300px;
   height: 100%;
 
   background: #ffffff;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
 
-  padding: 0;
+  padding: 20px;
   transition: right 0.3s ease;
 
   z-index: 999;
@@ -38,4 +38,32 @@ svg {
 
 #hostinfo-sidebar.open {
   right: 0;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #666;
+  flex: 1;
+}
+
+.info-value {
+  flex: 2;
+  text-align: right;
+  color: #222;
+  word-break: break-word;
 }
