@@ -1,19 +1,43 @@
 # Graphing
 
-Node size should scale with the amount of nodes (in the subnet?) # No? What was I thinking
- most information can be passed as kwargs
+## Settings
+* dark mode?
+* show subnets?
+* recency?
+* Show hostnames?
+* and so on
 
-root router should connect to cloud node if ip addresses that are outside the subnets are reached. The cloud should not have any information stored about it (IP addresses, hostnames and so on)
-
-hosts should have a force pointing outward, decreasing exponentially the further they go. Eventually 0. Maybe should apply to all parents routers, so that they get pushed out of the middle aswell as from their router, making them bunch up less. But maybe just root router...
-
-## Web
+## Host information
+Click on host -> Highlight
 Click on host to view information:
-    * hostnames,
     * ip addresses,
     * hosts talked to,
+    * subnets(s)
+    * Online/offline (last seen),
     * and so on.
 
+## Forces
+Pull clients out of the center, decreasing with the distance from the center.
+
+## Generic
+All hosts outside the local ip ranges (10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, and 192.168.0.0–192.168.255.255) should mark the hosts as external. These should be togglable in settings.
+
+Host icon should be based on the hostname, if it contains client or server, it gets that icon. If not, set sensible default.
+
+Infer roles from port usage. A host can have multiple roles
+
+## UI
+add search bar, to search for IP, hostnames
+also add filtering by subnet, roles, external/internal
+
+hovering over host, gives (hostname, IP, roles)
+
+# Code base
+
+## Testing
+All components should be rigorously tested.
+Both unit tests and system wide.
+pytest
 
 # Thesis
 
