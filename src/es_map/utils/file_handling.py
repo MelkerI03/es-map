@@ -22,8 +22,8 @@ def copy_and_replace(src: Path, dst: Path) -> None:
     """
     Copy a file or directory to a destination, overwriting existing content.
 
-    - If src is a file → copied as a file
-    - If src is a directory → copied recursively
+    - If src is a file -> copied as a file
+    - If src is a directory -> copied recursively
     - Existing files/directories at destination are overwritten
     """
 
