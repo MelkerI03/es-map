@@ -26,10 +26,26 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
   const nodes = container.selectAll(".node")
     .data(data.nodes)
     .enter()
-    .append("circle")
+    .append("g")
     .attr("class", d => `node ${d.type}`)
-    .attr("r", CONFIG.nodeRadius)
     .call(drag);
+
+
+  nodes.append("rect")
+    .attr("width", CONFIG.nodeRectSize)
+    .attr("height", CONFIG.nodeRectSize)
+    .attr("rx", 10)
+    .attr("ry", 10)
+    .attr("x", -CONFIG.nodeRectSize / 2)
+    .attr("y", -CONFIG.nodeRectSize / 2)
+    .attr("fill", "#eee");
+
+  nodes.append("image")
+    .attr("href", d => d.type === "host" ? "./icons/laptop.svg" : "./icons/router.svg")
+    .attr("width", CONFIG.nodeIconSize)
+    .attr("height", CONFIG.nodeIconSize)
+    .attr("x", -CONFIG.nodeIconSize / 2)
+    .attr("y", -CONFIG.nodeIconSize / 2);
 
   const labels = container.selectAll(".label")
     .data(data.nodes)
@@ -38,13 +54,13 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
     .attr("text-anchor", "middle")
     .style("pointer-events", "none")
     .style("font-size", "15px")
-    .text(d => d.type === "host" ? d.label : "router");
+    .text(d => d.type === "host" ? d.label : "");
 
   const line = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.75));
 
   simulation.on("tick", () => {
-    nodes.attr("cx", d => d.x)
-      .attr("cy", d => d.y);
+    nodes
+      .attr("transform", d => `translate(${d.x}, ${d.y})`);
 
     labels.attr("x", d => d.x)
       .attr("y", d => d.y + CONFIG.labelOffsetY);
