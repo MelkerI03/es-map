@@ -11,6 +11,7 @@ to be consumed by frontend visualization clients.
 import threading
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from es_map.graph.api.models import Graph
@@ -46,6 +47,13 @@ def create_app(graph: Graph) -> FastAPI:
     app = FastAPI()
 
     app.state.graph = graph
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     @app.get("/graph", response_model=Graph)
     def get_graph() -> Graph:
