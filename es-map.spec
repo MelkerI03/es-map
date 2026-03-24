@@ -11,7 +11,9 @@ a = Analysis(
     ],
     hiddenimports=[
         'matplotlib.backends.backend_svg',
+        'pydantic',
         'pydantic_core._pydantic_core',
+        'pydantic.deprecated.decorator',
     ],
     hookspath=[],
     hooksconfig={},
