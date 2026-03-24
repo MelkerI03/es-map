@@ -20,12 +20,13 @@ const zoom = d3.zoom()
 svg.call(zoom);
 
 // UI
-initSidebar();
+initSidebar({ sidebarId: "settings-sidebar", triggerId: "settings-btn" });
+const hostSidebar = initSidebar({ sidebarId: "hostinfo-sidebar", triggerId: null });
 
 // Main
 loadGraph().then(data => {
   const simulation = createSimulation(data.nodes, data.edges, width, height);
   const drag = createDrag(simulation);
 
-  renderGraph(container, data, simulation, drag);
+  renderGraph(container, data, simulation, drag, hostSidebar);
 });

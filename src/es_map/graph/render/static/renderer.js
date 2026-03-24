@@ -1,7 +1,8 @@
 import { CONFIG } from "./config.js";
 import { padHull } from "./utils.js";
+import { updateHostSidebar } from "./ui.js";
 
-export function renderGraph(container, data, simulation, drag) {
+export function renderGraph(container, data, simulation, drag, hostSidebar) {
   const nodeMap = new Map(data.nodes.map(d => [d.id, d]));
 
   const edges = container.selectAll(".edge")
@@ -66,5 +67,14 @@ export function renderGraph(container, data, simulation, drag) {
 
       return line(padHull(hull, CONFIG.subnetPadding));
     });
+  });
+
+  nodes.on("click", (event, d) => {
+    event.stopPropagation();
+
+    if (d.type === "host") {
+      hostSidebar.open();
+      updateHostSidebar(d);
+    }
   });
 }

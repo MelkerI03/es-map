@@ -3,8 +3,7 @@ svg {
   height: 100vh;
 }
 
-/* Sidebar */
-#sidebar {
+#settings-sidebar {
   position: fixed;
   top: 0;
   left: -300px;
@@ -12,11 +11,31 @@ svg {
   height: 100%;
   background: #f4f4f4;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  padding: 20px;
+  padding: 0;
   transition: left 0.3s ease;
   z-index: 999;
 }
 
-#sidebar.open {
+#settings-sidebar.open {
   left: 0;
+}
+
+#hostinfo-sidebar {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+
+  background: #ffffff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+
+  padding: 0;
+  transition: right 0.3s ease;
+
+  z-index: 999;
+}
+
+#hostinfo-sidebar.open {
+  right: 0;
 }
