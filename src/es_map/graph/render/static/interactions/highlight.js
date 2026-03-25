@@ -1,3 +1,5 @@
+import { resetGraph } from "./reset.js";
+
 export function highlightNode({
   nodes,
   edges,
@@ -5,7 +7,8 @@ export function highlightNode({
   event,
   CONFIG
 }) {
-  // dim everything
+  resetGraph({ nodes, edges, subnetPaths, CONFIG })
+
   nodes.classed("selected", false).classed("dimmed", true);
   edges.classed("dimmed", true);
   subnetPaths.classed("dimmed", true);
