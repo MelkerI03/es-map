@@ -7,10 +7,6 @@
 - recency?
 - Show hostnames?
 
-## Host information
-
-Click on host -> Highlight
-
 ## Forces
 
 Pull clients out of the center, decreasing with the distance from the center.
