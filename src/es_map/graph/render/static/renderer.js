@@ -1,8 +1,9 @@
 import { CONFIG } from "./config.js";
 import { padHull } from "./utils.js";
-import { updateHostSidebar } from "./ui.js";
+import { initSidebar, updateHostSidebar } from "./ui.js";
+import { setupSelections } from "./interactions/selection.js";
 
-export function renderGraph(container, data, simulation, drag, hostSidebar) {
+export function renderGraph(container, data, simulation, drag) {
   const nodeMap = new Map(data.nodes.map((d) => [d.id, d]));
 
   const defs = container.append("defs");
@@ -108,81 +109,18 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
     });
   });
 
-  nodes.on("click", (event, d) => {
-    event.stopPropagation();
-
-    if (d.type !== "host") return;
-
-    hostSidebar.open();
-    updateHostSidebar(d);
-
-    nodes
-      .classed("selected", false)
-      .classed("dimmed", true);
-
-    edges
-      .classed("dimmed", true);
-
-    subnetPaths
-      .classed("dimmed", true);
-
-    const selectedNode = d3.select(event.currentTarget);
-    selectedNode
-      .classed("selected", true)
-      .classed("dimmed", false);
-
-    selectedNode.select("image")
-      .transition()
-      .duration(200)
-      .attr("width", CONFIG.nodeIconSize * CONFIG.selectedScale)
-      .attr("height", CONFIG.nodeIconSize * CONFIG.selectedScale)
-      .attr("x", -CONFIG.nodeIconSize / 2 * CONFIG.selectedScale)
-      .attr("y", -CONFIG.nodeIconSize / 2 * CONFIG.selectedScale);
-
-    selectedNode.select("rect")
-      .transition()
-      .duration(200)
-      .attr("width", CONFIG.nodeRectSize * CONFIG.selectedScale)
-      .attr("height", CONFIG.nodeRectSize * CONFIG.selectedScale)
-      .attr("x", -CONFIG.nodeRectSize / 2 * CONFIG.selectedScale)
-      .attr("y", -CONFIG.nodeRectSize / 2 * CONFIG.selectedScale);
-
-    selectedNode.select("text")
-      .transition()
-      .duration(200)
-      .attr("y", CONFIG.labelOffsetY * (CONFIG.selectedScale + 1) / 2) // Half the scale
+  const hostSidebar = initSidebar({
+    sidebarId: "hostinfo-sidebar",
+    triggerId: null,
   });
 
-  container.on("click", () => {
-    nodes
-      .classed("selected", false)
-      .classed("dimmed", false);
-
-    nodes.select("image")
-      .transition()
-      .duration(200)
-      .attr("width", CONFIG.nodeIconSize)
-      .attr("height", CONFIG.nodeIconSize)
-      .attr("x", -CONFIG.nodeIconSize / 2)
-      .attr("y", -CONFIG.nodeIconSize / 2);
-
-    nodes.select("rect")
-      .transition()
-      .duration(200)
-      .attr("width", CONFIG.nodeRectSize)
-      .attr("height", CONFIG.nodeRectSize)
-      .attr("x", -CONFIG.nodeRectSize / 2)
-      .attr("y", -CONFIG.nodeRectSize / 2);
-
-    nodes.select("text")
-      .transition()
-      .duration(200)
-      .attr("y", CONFIG.labelOffsetY);
-
-    edges
-      .classed("dimmed", false)
-
-    subnetPaths
-      .classed("dimmed", false);
+  setupSelections({
+    nodes,
+    edges,
+    subnetPaths,
+    hostSidebar,
+    updateHostSidebar,
+    CONFIG
   });
+
 }

@@ -1,7 +1,7 @@
 import { loadGraph } from "./api.js";
 import { initSidebar } from "./ui.js";
 import { createSimulation } from "./simulation.js";
-import { createDrag } from "./interactions.js";
+import { createDrag } from "./interactions/interactions.js";
 import { renderGraph } from "./renderer.js";
 
 const svg = d3.select("#graph");
@@ -22,15 +22,11 @@ svg.call(zoom);
 
 // UI
 initSidebar({ sidebarId: "settings-sidebar", triggerId: "settings-btn" });
-const hostSidebar = initSidebar({
-  sidebarId: "hostinfo-sidebar",
-  triggerId: null,
-});
 
 // Main
 loadGraph().then((data) => {
   const simulation = createSimulation(data.nodes, data.edges, width, height);
   const drag = createDrag(simulation);
 
-  renderGraph(container, data, simulation, drag, hostSidebar);
+  renderGraph(container, data, simulation, drag);
 });

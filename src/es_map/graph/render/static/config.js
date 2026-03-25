@@ -4,6 +4,6 @@ export const CONFIG = {
   nodeRectSize: 40,
   nodeIconSize: 32,
   subnetPadding: 80,
-  labelOffsetY: 50,
+  labelOffsetY: 40,
   selectedScale: 1.4,
 };
