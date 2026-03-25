@@ -1,8 +1,10 @@
 import { CONFIG } from "./config.js";
 import { padHull } from "./utils.js";
-import { updateHostSidebar } from "./ui.js";
+import { createDrag } from "./interactions/interactions.js";
+import { initSidebar, updateHostSidebar } from "./ui.js";
+import { setupSelections } from "./interactions/selection.js";
 
-export function renderGraph(container, data, simulation, drag, hostSidebar) {
+export function renderGraph(container, data, simulation) {
   const nodeMap = new Map(data.nodes.map((d) => [d.id, d]));
 
   const defs = container.append("defs");
@@ -52,8 +54,7 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
     .data(data.nodes)
     .enter()
     .append("g")
-    .attr("class", (d) => `node ${d.type}`)
-    .call(drag);
+    .attr("class", (d) => `node ${d.type}`);
 
   nodes
     .append("rect")
@@ -75,12 +76,10 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
     .attr("x", -CONFIG.nodeIconSize / 2)
     .attr("y", -CONFIG.nodeIconSize / 2);
 
-  const labels = container
-    .selectAll(".label")
-    .data(data.nodes)
-    .enter()
+  nodes
     .append("text")
     .attr("text-anchor", "middle")
+    .attr("y", CONFIG.labelOffsetY)
     .style("pointer-events", "none")
     .style("font-size", "15px")
     .text((d) => (d.type === "host" ? d.label : ""));
@@ -89,8 +88,6 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
 
   simulation.on("tick", () => {
     nodes.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
-
-    labels.attr("x", (d) => d.x).attr("y", (d) => d.y + CONFIG.labelOffsetY);
 
     edges
       .attr("x1", (d) => nodeMap.get(d.source.id).x)
@@ -113,12 +110,19 @@ export function renderGraph(container, data, simulation, drag, hostSidebar) {
     });
   });
 
-  nodes.on("click", (event, d) => {
-    event.stopPropagation();
+  const hostSidebar = initSidebar({
+    sidebarId: "hostinfo-sidebar",
+    triggerId: null,
+  });
 
-    if (d.type === "host") {
-      hostSidebar.open();
-      updateHostSidebar(d);
-    }
+  const drag = createDrag({ nodes, edges, subnetPaths, hostSidebar, simulation });
+  nodes.call(drag);
+
+  setupSelections({
+    nodes,
+    edges,
+    subnetPaths,
+    hostSidebar,
+    updateHostSidebar,
   });
 }

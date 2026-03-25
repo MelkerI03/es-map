@@ -3,12 +3,21 @@
   stroke-width: 1px;
 }
 
+.node text {
+  fill: #000;
+  stroke-width: 0px;
+}
+
 .host {
   fill: #66b2ff;
   cursor: pointer;
   transition:
     stroke 0.2s ease,
     stroke-width 0.2s ease;
+}
+
+.host.selected {
+  filter: brightness(1.2);
 }
 
 .host:hover {
@@ -27,7 +36,12 @@
 
 .subnet {
   fill: lightblue;
-  opacity: 0.2;
   stroke: #3399ff;
   stroke-width: 2px;
+}
+
+.dimmed {
+  opacity: 0.8;
+  filter: blur(2px);
+  transition: all 0.2s;
 }
