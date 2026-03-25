@@ -66,4 +66,5 @@ svg {
   text-align: right;
   color: #222;
   word-break: break-word;
+  white-space: pre-line;
 }
