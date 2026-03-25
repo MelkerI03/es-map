@@ -5,6 +5,28 @@ import { updateHostSidebar } from "./ui.js";
 export function renderGraph(container, data, simulation, drag, hostSidebar) {
   const nodeMap = new Map(data.nodes.map((d) => [d.id, d]));
 
+  const defs = container.append("defs");
+
+  defs
+    .append("pattern")
+    .attr("id", "grid")
+    .attr("width", 40)
+    .attr("height", 40)
+    .attr("patternUnits", "userSpaceOnUse")
+    .append("circle")
+    .attr("cx", 2)
+    .attr("cy", 2)
+    .attr("r", 1.5)
+    .attr("fill", "#e5e7eb");
+
+  container
+    .insert("rect", ":first-child")
+    .attr("x", -10000)
+    .attr("y", -10000)
+    .attr("width", 20000)
+    .attr("height", 20000)
+    .attr("fill", "url(#grid)");
+
   const edges = container
     .selectAll(".edge")
     .data(data.edges)
