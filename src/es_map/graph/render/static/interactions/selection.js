@@ -7,7 +7,6 @@ export function setupSelections({
   subnetPaths,
   hostSidebar,
   updateHostSidebar,
-  CONFIG
 }) {
   nodes.on("click", (event, d) => {
     event.stopPropagation();
@@ -22,11 +21,10 @@ export function setupSelections({
       edges,
       subnetPaths,
       event,
-      CONFIG
     });
   });
 
   d3.select("svg").on("click", () => {
-    resetGraph({ nodes, edges, subnetPaths, CONFIG });
+    resetGraph({ nodes, edges, subnetPaths });
   });
 }

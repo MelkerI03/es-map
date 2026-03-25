@@ -1,7 +1,10 @@
-export function resetGraph({ nodes, edges, subnetPaths, CONFIG }) {
+import { CONFIG } from "../config.js";
+
+export function resetGraph({ nodes, edges, subnetPaths }) {
   nodes.classed("selected", false).classed("dimmed", false);
 
-  nodes.select("image")
+  nodes
+    .select("image")
     .transition()
     .duration(200)
     .attr("width", CONFIG.nodeIconSize)
@@ -9,7 +12,8 @@ export function resetGraph({ nodes, edges, subnetPaths, CONFIG }) {
     .attr("x", -CONFIG.nodeIconSize / 2)
     .attr("y", -CONFIG.nodeIconSize / 2);
 
-  nodes.select("rect")
+  nodes
+    .select("rect")
     .transition()
     .duration(200)
     .attr("width", CONFIG.nodeRectSize)
@@ -17,7 +21,8 @@ export function resetGraph({ nodes, edges, subnetPaths, CONFIG }) {
     .attr("x", -CONFIG.nodeRectSize / 2)
     .attr("y", -CONFIG.nodeRectSize / 2);
 
-  nodes.select("text")
+  nodes
+    .select("text")
     .transition()
     .duration(200)
     .attr("y", CONFIG.labelOffsetY);

@@ -1,4 +1,6 @@
-export function createDrag(simulation) {
+import { resetGraph } from "./reset.js";
+
+export function createDrag({ nodes, edges, subnetPaths, simulation }) {
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
@@ -18,7 +20,10 @@ export function createDrag(simulation) {
 
   return d3
     .drag()
-    .on("start", dragstarted)
+    .on("start", (event, d) => {
+      resetGraph({ nodes, edges, subnetPaths });
+      dragstarted(event, d);
+    })
     .on("drag", dragged)
     .on("end", dragended);
 }

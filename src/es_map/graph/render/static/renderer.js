@@ -1,9 +1,10 @@
 import { CONFIG } from "./config.js";
 import { padHull } from "./utils.js";
+import { createDrag } from "./interactions/interactions.js";
 import { initSidebar, updateHostSidebar } from "./ui.js";
 import { setupSelections } from "./interactions/selection.js";
 
-export function renderGraph(container, data, simulation, drag) {
+export function renderGraph(container, data, simulation) {
   const nodeMap = new Map(data.nodes.map((d) => [d.id, d]));
 
   const defs = container.append("defs");
@@ -53,8 +54,7 @@ export function renderGraph(container, data, simulation, drag) {
     .data(data.nodes)
     .enter()
     .append("g")
-    .attr("class", (d) => `node ${d.type}`)
-    .call(drag);
+    .attr("class", (d) => `node ${d.type}`);
 
   nodes
     .append("rect")
@@ -76,7 +76,8 @@ export function renderGraph(container, data, simulation, drag) {
     .attr("x", -CONFIG.nodeIconSize / 2)
     .attr("y", -CONFIG.nodeIconSize / 2);
 
-  nodes.append("text")
+  nodes
+    .append("text")
     .attr("text-anchor", "middle")
     .attr("y", CONFIG.labelOffsetY)
     .style("pointer-events", "none")
@@ -114,13 +115,14 @@ export function renderGraph(container, data, simulation, drag) {
     triggerId: null,
   });
 
+  const drag = createDrag({ nodes, edges, subnetPaths, hostSidebar, simulation });
+  nodes.call(drag);
+
   setupSelections({
     nodes,
     edges,
     subnetPaths,
     hostSidebar,
     updateHostSidebar,
-    CONFIG
   });
-
 }

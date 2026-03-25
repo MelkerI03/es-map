@@ -1,7 +1,6 @@
 import { loadGraph } from "./api.js";
 import { initSidebar } from "./ui.js";
 import { createSimulation } from "./simulation.js";
-import { createDrag } from "./interactions/interactions.js";
 import { renderGraph } from "./renderer.js";
 
 const svg = d3.select("#graph");
@@ -26,7 +25,6 @@ initSidebar({ sidebarId: "settings-sidebar", triggerId: "settings-btn" });
 // Main
 loadGraph().then((data) => {
   const simulation = createSimulation(data.nodes, data.edges, width, height);
-  const drag = createDrag(simulation);
 
-  renderGraph(container, data, simulation, drag);
+  renderGraph(container, data, simulation);
 });
