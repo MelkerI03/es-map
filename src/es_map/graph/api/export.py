@@ -68,7 +68,8 @@ def export_graph(registry: SubnetRegistry) -> Graph:
 
         edges.extend(_build_host_edges(current_subnet_hosts, router))
 
-        subnets.append(_build_subnet(registry_subnet))
+        if not registry_subnet.network == registry.root_subnet:
+            subnets.append(_build_subnet(registry_subnet))
 
     layout = generate_layout(nodes, edges)
 
