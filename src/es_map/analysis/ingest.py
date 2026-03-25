@@ -92,6 +92,10 @@ def build_hosts(client: Elasticsearch, index_name: str | None) -> list[Host]:
                 )
                 continue
 
+            if ip_addr in ipaddress.IPv4Network("127.0.0.0/8"):
+                # Don't include loopback addresses
+                continue
+
             host.add_ip(ip_addr)
             all_ips.add(ip_str)
 
