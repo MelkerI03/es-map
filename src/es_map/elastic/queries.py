@@ -53,7 +53,8 @@ def fetch_hosts(client: Elasticsearch, query_index: str | None) -> list[dict]:
                     "ips": {"terms": {"field": "host.ip", "size": 100}},
                     "first_seen": {"min": {"field": "@timestamp"}},
                     "last_seen": {"max": {"field": "@timestamp"}},
-                    "connections": {
+                    "source_ips": {"terms": {"field": "source.ip", "size": 1000}},
+                    "destination_ips": {
                         "terms": {
                             "field": "destination.ip",
                             "size": 1000,
@@ -90,8 +91,13 @@ def fetch_hosts(client: Elasticsearch, query_index: str | None) -> list[dict]:
         first_seen = bucket.get("first_seen", {}).get("value", "")
         last_seen = bucket.get("last_seen", {}).get("value", "")
 
-        connection_buckets = bucket.get("connections", {}).get("buckets", [])
-        connections = [conn["key"] for conn in connection_buckets]
+        source_ips_buckets = bucket.get("source_ips", {}).get("buckets", [])
+        source_ips = {conn["key"] for conn in source_ips_buckets}
+
+        destination_ips_buckets = bucket.get("destination_ips", {}).get("buckets", [])
+        destination_ips = {conn["key"] for conn in destination_ips_buckets}
+
+        connections = list(source_ips | destination_ips)
 
         results.append(
             {
