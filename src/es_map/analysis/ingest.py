@@ -111,4 +111,5 @@ def build_hosts(client: Elasticsearch, index_name: str | None) -> list[Host]:
             "host_count": len(hosts),
         },
     )
+
     return hosts
