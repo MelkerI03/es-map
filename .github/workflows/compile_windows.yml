@@ -1,6 +1,7 @@
 name: Build Windows EXE with PyInstaller
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
