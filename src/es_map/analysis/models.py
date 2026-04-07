@@ -214,5 +214,6 @@ class SubnetRegistry:
                 extra={"host_id": host.host_id},
             )
             self.externally_connected = True
+            return
 
         most_specific_subnet.add_host(host)
