@@ -28,15 +28,15 @@ def main(
     subnet_cidrs: list[str] = typer.Argument(
         ..., help="List of subnets in CIDR notation"
     ),
-    elastic_host: str = typer.Option(
-        "localhost",
+    elastic_host: str | None = typer.Option(
+        None,
         "--host",
         "-H",
         help="Elasticsearch host",
         envvar="ES_HOST",
     ),
-    elastic_port: int = typer.Option(
-        9200,
+    elastic_port: int | None = typer.Option(
+        None,
         "--port",
         "-p",
         help="Elasticsearch port",
@@ -64,13 +64,6 @@ def main(
         help="Elasticsearch API key",
         hide_input=True,
         envvar="ES_API_KEY",
-    ),
-    index: str | None = typer.Option(
-        None,
-        "--index",
-        "-i",
-        help="Specific index to analyze",
-        envvar="ES_INDEX",
     ),
     ssl_enabled: bool = typer.Option(
         False,
@@ -108,6 +101,23 @@ def main(
         help="Verify server certificate",
         envvar="ES_VERIFY",
     ),
+    input_file: Path | None = typer.Option(
+        None,
+        "--input",
+        "-f",
+        help="Path to Elasticsearch export JSON/NDJSON file",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+    ),
+    index: str | None = typer.Option(
+        None,
+        "--index",
+        "-i",
+        help="Specific index to analyze",
+        envvar="ES_INDEX",
+    ),
     log_level: str = typer.Option(
         "INFO",
         "--log-level",
@@ -125,22 +135,6 @@ def main(
     This command-line interface connects to an Elasticsearch cluster,
     retrieves host data, builds a subnet hierarchy, and generates
     a visual network graph.
-
-    Args:
-        subnet_cidrs: List of CIDR subnet strings to analyze.
-        elastic_host: Elasticsearch host address.
-        elastic_port: Elasticsearch port.
-        username: Optional Elasticsearch username.
-        password: Optional Elasticsearch password.
-        api_key: Optional Elasticsearch API key.
-        index: Optional Elasticsearch index to query.
-        ssl_enabled: Whether to use HTTPS.
-        ca_cert: Path to CA certificate.
-        client_cert: Path to client certificate.
-        client_key: Path to client private key.
-        verify_ssl: Whether to verify SSL certificates.
-        log_level: Logging verbosity level.
-        log_file: Optional log file path.
     """
     setup_logging(log_level=log_level, log_file=log_file)
 
@@ -162,7 +156,6 @@ def main(
         host=elastic_host,
         port=elastic_port,
         subnet_cidrs=subnet_cidrs,
-        index=index,
         username=username,
         password=password,
         api_key=api_key,
@@ -171,6 +164,7 @@ def main(
         client_cert=client_cert,
         client_key=client_key,
         verify_ssl=verify_ssl,
+        index=index,
     )
 
     client = create_client(elastic_config)
