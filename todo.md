@@ -42,7 +42,9 @@ pytest
 # Thesis
 
 ## Title
+
 Passiv logganalys för nätverkskartläggning
 
 ## Subtitle
+
 Design, implementation och utvärdering av ett system för att inferera nätverkstopologi från passiva loggkällor
