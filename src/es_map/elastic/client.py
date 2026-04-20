@@ -68,9 +68,6 @@ def create_client(config: ElasticConfig) -> Elasticsearch:
         "verify_certs": config.verify,
     }
 
-    if config.index:
-        kwargs["index"] = config.index
-
     if config.ca_cert:
         kwargs["ca_certs"] = str(config.ca_cert)
 

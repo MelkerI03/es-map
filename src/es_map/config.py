@@ -21,7 +21,6 @@ class ElasticConfig:
         host: Elasticsearch host address.
         port: Elasticsearch port.
         subnets: List of IPv4 networks to analyze.
-        index: Optional Elasticsearch index to query.
         username: Optional authentication username.
         password: Optional authentication password.
         api_key: Optional API key for authentication.
@@ -35,7 +34,6 @@ class ElasticConfig:
     host: str
     port: int
     subnets: list[ipaddress.IPv4Network]
-    index: str | None = None
     username: str | None = None
     password: str | None = None
     api_key: str | None = None
@@ -54,7 +52,6 @@ def build_config(
     host,
     port,
     subnet_cidrs,
-    index,
     username,
     password,
     api_key,
@@ -71,7 +68,6 @@ def build_config(
         host=host,
         port=port,
         subnets=parsed_subnets,
-        index=index,
         username=username,
         password=password,
         api_key=api_key,

@@ -41,31 +41,25 @@ def fetch_hosts_from_file(file: Path, query_index: str = "*") -> list[dict]:
         KeyError: If the expected aggregation structure is missing.
     """
 
-    def wildcard_to_regex(wildcard_pattern: str) -> list[str]:
+    def wildcard_to_regex(wildcard_pattern: str) -> str:
         """Translates wildcard syntax to a regex pattern.
 
         * -> matches everything (.*)
         ? -> matches any single character (.)
 
-        Returns: [regex_pattern, ".ds-" + regex_pattern]
+        Returns: regex_pattern
         """
         regex_pattern = re.escape(wildcard_pattern)
         regex_pattern = regex_pattern.replace(r"\*", ".*")
         regex_pattern = regex_pattern.replace(r"\?", ".")
 
-        return [
-            f"^{regex_pattern}$",
-            f"^\\.ds\\-{regex_pattern}$",
-        ]
+        return f"^(\\.ds\\-)?{regex_pattern}$"
 
-    index_patterns = wildcard_to_regex(query_index)
+    index_pattern = wildcard_to_regex(query_index)
 
     df = (
         pl.scan_ndjson(file, ignore_errors=True)
-        .filter(  # Filter for specified index(es)
-            (pl.col("_index").str.contains(index_patterns[0]))
-            | (pl.col("_index").str.contains(index_patterns[1]))
-        )
+        .filter(pl.col("_index").str.contains(index_pattern))
         .select(
             [
                 pl.col("_source")
