@@ -193,6 +193,9 @@ def main(
         )
         client = create_client(elastic_config)
 
+    if not index:
+        index = "*"
+
     graph = build_graph(
         client=client, input_file=input_file, index_name=index, subnets=subnet_cidrs
     )
