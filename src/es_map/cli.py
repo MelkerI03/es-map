@@ -5,6 +5,7 @@ construction, and rendering of a network topology visualization.
 """
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from dotenv import load_dotenv
@@ -25,110 +26,133 @@ app = typer.Typer(no_args_is_help=True, add_completion=False)
 
 @app.command()
 def main(
-    subnet_cidrs: list[str] = typer.Argument(
-        ..., help="List of subnets in CIDR notation"
-    ),
-    elastic_host: str | None = typer.Option(
-        None,
-        "--host",
-        "-H",
-        help="Elasticsearch host",
-        envvar="ES_HOST",
-    ),
-    elastic_port: int | None = typer.Option(
-        None,
-        "--port",
-        "-p",
-        help="Elasticsearch port",
-        envvar="ES_PORT",
-    ),
-    username: str | None = typer.Option(
-        None,
-        "--username",
-        "-u",
-        help="Elasticsearch username",
-        envvar="ES_USERNAME",
-    ),
-    password: str | None = typer.Option(
-        None,
-        "--password",
-        "-P",
-        help="Elasticsearch password",
-        hide_input=True,
-        envvar="ES_PASSWORD",
-    ),
-    api_key: str | None = typer.Option(
-        None,
-        "--api-key",
-        "-k",
-        help="Elasticsearch API key",
-        hide_input=True,
-        envvar="ES_API_KEY",
-    ),
-    ssl_enabled: bool = typer.Option(
-        False,
-        "--ssl",
-        "-s",
-        help="Use HTTPS",
-        envvar="ES_SSL",
-    ),
-    ca_cert: Path | None = typer.Option(
-        None,
-        "--ca-cert",
-        help="Path to CA certificate bundle",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        envvar="ES_CA_CERT",
-    ),
-    client_cert: Path | None = typer.Option(
-        None,
-        "--client-cert",
-        help="Path to client certificate (for mTLS)",
-        exists=True,
-        envvar="ES_CLIENT_CERT",
-    ),
-    client_key: Path | None = typer.Option(
-        None,
-        "--client-key",
-        help="Path to client private key (for mTLS)",
-        exists=True,
-        envvar="ES_CLIENT_KEY",
-    ),
-    verify_ssl: bool = typer.Option(
-        True,
-        "--verify/--no-verify",
-        help="Verify server certificate",
-        envvar="ES_VERIFY",
-    ),
-    input_file: Path | None = typer.Option(
-        None,
-        "--input",
-        "-f",
-        help="Path to Elasticsearch export JSON/NDJSON file",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        readable=True,
-    ),
-    index: str | None = typer.Option(
-        None,
-        "--index",
-        "-i",
-        help="Specific index to analyze",
-        envvar="ES_INDEX",
-    ),
-    log_level: str = typer.Option(
-        "INFO",
-        "--log-level",
-        "-l",
-        help="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
-    ),
-    log_file: Path | None = typer.Option(
-        None,
-        "--log-file",
-        help="Optional log file path",
-    ),
+    subnet_cidrs: Annotated[
+        list[str], typer.Argument(help="List of subnets in CIDR notation")
+    ],
+    elastic_host: Annotated[
+        str | None,
+        typer.Option("--host", "-H", help="Elasticsearch host", envvar="ES_HOST"),
+    ] = None,
+    elastic_port: Annotated[
+        int | None,
+        typer.Option(
+            "--port",
+            "-p",
+            help="Elasticsearch port",
+            envvar="ES_PORT",
+        ),
+    ] = None,
+    username: Annotated[
+        str | None,
+        typer.Option(
+            "--username",
+            "-u",
+            help="Elasticsearch username",
+            envvar="ES_USERNAME",
+        ),
+    ] = None,
+    password: Annotated[
+        str | None,
+        typer.Option(
+            "--password",
+            "-P",
+            help="Elasticsearch password",
+            hide_input=True,
+            envvar="ES_PASSWORD",
+        ),
+    ] = None,
+    api_key: Annotated[
+        str | None,
+        typer.Option(
+            "--api-key",
+            "-k",
+            help="Elasticsearch API key",
+            hide_input=True,
+            envvar="ES_API_KEY",
+        ),
+    ] = None,
+    ssl_enabled: Annotated[
+        bool,
+        typer.Option(
+            "--ssl",
+            "-s",
+            help="Use HTTPS",
+            envvar="ES_SSL",
+        ),
+    ] = False,
+    ca_cert: Annotated[
+        Path | None,
+        typer.Option(
+            "--ca-cert",
+            help="Path to CA certificate bundle",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            envvar="ES_CA_CERT",
+        ),
+    ] = None,
+    client_cert: Annotated[
+        Path | None,
+        typer.Option(
+            "--client-cert",
+            help="Path to client certificate (for mTLS)",
+            exists=True,
+            envvar="ES_CLIENT_CERT",
+        ),
+    ] = None,
+    client_key: Annotated[
+        Path | None,
+        typer.Option(
+            "--client-key",
+            help="Path to client private key (for mTLS)",
+            exists=True,
+            envvar="ES_CLIENT_KEY",
+        ),
+    ] = None,
+    verify_ssl: Annotated[
+        bool,
+        typer.Option(
+            "--verify/--no-verify",
+            help="Verify server certificate",
+            envvar="ES_VERIFY",
+        ),
+    ] = True,
+    input_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--input",
+            "-f",
+            help="Path to Elasticsearch export JSON/NDJSON file",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ] = None,
+    index: Annotated[
+        str | None,
+        typer.Option(
+            "--index",
+            "-i",
+            help="Specific index to analyze",
+            envvar="ES_INDEX",
+        ),
+    ] = None,
+    log_level: Annotated[
+        str,
+        typer.Option(
+            "--log-level",
+            "-l",
+            help="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+        ),
+    ] = "INFO",
+    log_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--log-file",
+            help="Optional log file path",
+        ),
+    ] = None,
 ) -> None:
     """Elasticsearch Network Mapper CLI.
 
@@ -166,7 +190,6 @@ def main(
             client_cert=client_cert,
             client_key=client_key,
             verify_ssl=verify_ssl,
-            index=index,
         )
         client = create_client(elastic_config)
 
