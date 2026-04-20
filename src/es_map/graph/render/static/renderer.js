@@ -115,7 +115,13 @@ export function renderGraph(container, data, simulation) {
     triggerId: null,
   });
 
-  const drag = createDrag({ nodes, edges, subnetPaths, hostSidebar, simulation });
+  const drag = createDrag({
+    nodes,
+    edges,
+    subnetPaths,
+    hostSidebar,
+    simulation,
+  });
   nodes.call(drag);
 
   setupSelections({

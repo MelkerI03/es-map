@@ -41,10 +41,10 @@ class Node(BaseModel):
     )
 
     first_seen: str = Field(
-        default_factory=str, description="First observation of node in logs (epoch)"
+        default_factory=str, description="First observation of node in logs (iso)"
     )
     last_seen: str = Field(
-        default_factory=str, description="Last observation of node in logs (epoch)"
+        default_factory=str, description="Last observation of node in logs (iso)"
     )
 
 

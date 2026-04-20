@@ -20,7 +20,7 @@
 
 - Generate a static, hierarchical image of a network topology inferred from an Elasticsearch instance.
 - The system accepts Elasticsearch-compatible documents (via elasticdump-style JSON exports).
-These documents are treated as raw event payloads and can optionally be compiled into a columnar Parquet representation for analytical workloads.
+  These documents are treated as raw event payloads and can optionally be compiled into a columnar Parquet representation for analytical workloads.
 - Currently supports visualization of subnet structures using CIDR notation.
 
 > **Note:** This is a work in progress and actively under development.
@@ -47,7 +47,7 @@ These documents are treated as raw event payloads and can optionally be compiled
 1. Ensure you can authenticate to your Elasticsearch instance using either flags or environment variables:
 
 | **Environment variable** | **Flag**      |
-|--------------------------|---------------|
+| ------------------------ | ------------- |
 | ES_HOST                  | --host        |
 | ES_PORT                  | --port        |
 | ES_USERNAME              | --username    |

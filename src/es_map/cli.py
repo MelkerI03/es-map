@@ -152,24 +152,27 @@ def main(
         },
     )
 
-    elastic_config = build_config(
-        host=elastic_host,
-        port=elastic_port,
-        subnet_cidrs=subnet_cidrs,
-        username=username,
-        password=password,
-        api_key=api_key,
-        ssl_enabled=ssl_enabled,
-        ca_cert=ca_cert,
-        client_cert=client_cert,
-        client_key=client_key,
-        verify_ssl=verify_ssl,
-        index=index,
+    client = None
+    if input_file is None:
+        elastic_config = build_config(
+            host=elastic_host,
+            port=elastic_port,
+            subnet_cidrs=subnet_cidrs,
+            username=username,
+            password=password,
+            api_key=api_key,
+            ssl_enabled=ssl_enabled,
+            ca_cert=ca_cert,
+            client_cert=client_cert,
+            client_key=client_key,
+            verify_ssl=verify_ssl,
+            index=index,
+        )
+        client = create_client(elastic_config)
+
+    graph = build_graph(
+        client=client, input_file=input_file, index_name=index, subnets=subnet_cidrs
     )
-
-    client = create_client(elastic_config)
-
-    graph = build_graph(client, elastic_config)
 
     start_api(graph)
 
