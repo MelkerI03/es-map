@@ -29,7 +29,7 @@ logger = get_logger(__name__)
 def build_graph(
     client: Elasticsearch | None,
     input_file: Path | None,
-    index_name: str | None,
+    index_name: str,
     subnets: list[str],
 ):
     parsed_subnets = parse_subnets(subnets)
@@ -40,8 +40,6 @@ def build_graph(
         hosts = build_hosts_from_client(client, index_name)
         logger.info("Fetched hosts from Elasticsearch", extra={"count": len(hosts)})
     else:
-        if index_name is None:
-            index_name = "*"
         hosts = build_hosts_from_file(input_file, index_name)
         logger.info("Fetched hosts from input file", extra={"count": len(hosts)})
 
@@ -61,9 +59,7 @@ def build_hosts_from_file(file: Path, index_name: str) -> list[Host]:
     return _build_hosts_from_dict(raw_host_records)
 
 
-def build_hosts_from_client(
-    client: Elasticsearch, index_name: str | None
-) -> list[Host]:
+def build_hosts_from_client(client: Elasticsearch, index_name: str) -> list[Host]:
     """Build Host objects from Elasticsearch data.
 
     Fetches raw host data from Elasticsearch and converts it into
@@ -71,7 +67,7 @@ def build_hosts_from_client(
 
     Args:
         client: Elasticsearch client instance.
-        index_name: Optional index name to query.
+        index_name: Elasticsearch index to query.
 
     Returns:
         A list of Host objects populated with IPv4 addresses.

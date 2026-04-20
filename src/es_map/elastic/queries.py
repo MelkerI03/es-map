@@ -18,7 +18,7 @@ from es_map.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
-def fetch_hosts_from_file(file: Path, query_index: str = "*") -> list[dict]:
+def fetch_hosts_from_file(file: Path, query_index: str) -> list[dict]:
     """Fetch host information from Elasticdump formatted file
 
     This query groups documents by host ID and retrieves associated
@@ -26,7 +26,7 @@ def fetch_hosts_from_file(file: Path, query_index: str = "*") -> list[dict]:
 
     Args:
         client: Elasticsearch client instance. TODO
-        query_index: Optional index to query. If not provided, all indices are queried.
+        query_index: Elasticsearch index to query.
 
     Returns:
         A list of dictionaries containing:
@@ -132,9 +132,7 @@ def fetch_hosts_from_file(file: Path, query_index: str = "*") -> list[dict]:
     return df.to_dicts()
 
 
-def fetch_hosts_from_client(
-    client: Elasticsearch, query_index: str | None
-) -> list[dict]:
+def fetch_hosts_from_client(client: Elasticsearch, query_index: str) -> list[dict]:
     """Fetch host information from Elasticsearch using aggregations.
 
     This query groups documents by host ID and retrieves associated
@@ -142,7 +140,7 @@ def fetch_hosts_from_client(
 
     Args:
         client: Elasticsearch client instance.
-        query_index: Optional index to query. If not provided, all indices are queried.
+        query_index: Elasticsearch index to query.
 
     Returns:
         A list of dictionaries containing:
@@ -163,10 +161,6 @@ def fetch_hosts_from_client(
         dt_object = datetime.fromtimestamp(time / 1000, UTC)  # Translate from ms -> s
         iso_time = dt_object.strftime(strftime_format)[:-3] + "Z"  # Jank
         return iso_time
-
-    query_index = (
-        query_index or "*"
-    )  # Default to querying all indices if none specified
 
     logger.debug(
         "Fetching hosts from Elasticsearch",
