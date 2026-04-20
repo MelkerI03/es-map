@@ -1,12 +1,12 @@
-import { CONFIG } from "./config.js";
-import { padHull } from "./utils.js";
-import { createDrag } from "./interactions/interactions.js";
-import { initSidebar, updateHostSidebar } from "./ui.js";
-import { setupSelections } from "./interactions/selection.js";
+import { CONFIG } from "./config";
+import { setupSelections } from "./interactions/selection";
+import { initSidebar } from "./ui";
+import { padHull } from "./utils";
 
 export function renderGraph(container, data, simulation) {
   const nodeMap = new Map(data.nodes.map((d) => [d.id, d]));
 
+  const drag = createDrag({ nodes, simulation });
   const defs = container.append("defs");
 
   defs
@@ -54,7 +54,8 @@ export function renderGraph(container, data, simulation) {
     .data(data.nodes)
     .enter()
     .append("g")
-    .attr("class", (d) => `node ${d.type}`);
+    .attr("class", (d) => `node ${d.type}`)
+    .call(drag);
 
   nodes
     .append("rect")
@@ -115,20 +116,12 @@ export function renderGraph(container, data, simulation) {
     triggerId: null,
   });
 
-  const drag = createDrag({
-    nodes,
-    edges,
-    subnetPaths,
-    hostSidebar,
-    simulation,
-  });
-  nodes.call(drag);
-
   setupSelections({
     nodes,
     edges,
     subnetPaths,
     hostSidebar,
     updateHostSidebar,
+    CONFIG,
   });
 }

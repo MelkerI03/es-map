@@ -8,3 +8,4 @@ build/*
 dist/*
 es_map.egg*
 **/__pycache__/
+*.json

@@ -19,6 +19,8 @@
 ## Features
 
 - Generate a static, hierarchical image of a network topology inferred from an Elasticsearch instance.
+- The system accepts Elasticsearch-compatible documents (via elasticdump-style JSON exports).
+  These documents are treated as raw event payloads and can optionally be compiled into a columnar Parquet representation for analytical workloads.
 - Currently supports visualization of subnet structures using CIDR notation.
 
 > **Note:** This is a work in progress and actively under development.
@@ -44,19 +46,19 @@
 
 1. Ensure you can authenticate to your Elasticsearch instance using either flags or environment variables:
 
-```
-ES_HOST			| --host
-ES_PORT			| --port
-ES_USERNAME		| --username
-ES_PASSWORD		| --password
-ES_API_KEY		| --api-key
-ES_SSL			| --ssl
-ES_CA_CERT		| --ca-cert
-ES_CLIENT_CERT	| --client-cert
-ES_CLIENT_KEY	| --client-key
-```
+| **Environment variable** | **Flag**      |
+| ------------------------ | ------------- |
+| ES_HOST                  | --host        |
+| ES_PORT                  | --port        |
+| ES_USERNAME              | --username    |
+| ES_PASSWORD              | --password    |
+| ES_API_KEY               | --api-key     |
+| ES_SSL                   | --ssl         |
+| ES_CA_CERT               | --ca-cert     |
+| ES_CLIENT_CERT           | --client-cert |
+| ES_CLIENT_KEY            | --client-key  |
 
-For more information, please read the [elasticsearch api documentation](https://www.elastic.co/docs/api/doc/elasticsearch/authentication).
+> For more information, please read the [elasticsearch api documentation](https://www.elastic.co/docs/api/doc/elasticsearch/authentication).
 
 2. Run the tool:
 
@@ -73,5 +75,3 @@ or further information on how the tool is run:
 ## Contribution Guidelines
 
 Because this is a bachelors thesis, contributions must be made via forking this repository.
-
-## Acknowledgments
